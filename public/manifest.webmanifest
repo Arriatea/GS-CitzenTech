@@ -1,0 +1,12 @@
+{
+  "name": "Gota a Gota",
+  "short_name": "Gota a Gota",
+  "description": "A água do poço, a horta e a venda da comunidade.",
+  "lang": "pt-BR",
+  "start_url": "./#inicio",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffdf7",
+  "theme_color": "#fffdf7",
+  "icons": [{ "src": "icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

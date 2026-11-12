@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { PiCameraFill, PiCheckCircleFill, PiFirstAidKitFill, PiPlantFill, PiWarningFill } from 'react-icons/pi'
+import { PiCameraFill, PiCheckCircleFill, PiFirstAidKitFill, PiPlantFill, PiVideoCameraFill, PiWarningFill } from 'react-icons/pi'
+import CartaoFalante from '../components/CartaoFalante.jsx'
 import Topo from '../components/Topo.jsx'
 import { canteiros } from '../data/mock.js'
 import { useAudioDescricao, useDescricao } from '../lib/AudioDescricao.jsx'
@@ -19,44 +20,57 @@ const respostaFoto = {
   aula: 'pulgao',
 }
 
-function Canteiro({ canteiro, ir, dizer }) {
+function Canteiro({ canteiro, ir }) {
   const estado = estados[canteiro.estado]
-  const falaEstado = canteiro.estado === 'cuidado' ? 'Precisa de cuidado. Toque em Como cuidar.' : estado.texto
+  const cuidado = canteiro.estado === 'cuidado'
+  const fala = [canteiro.nome + '.', estado.texto + '.', canteiro.aviso || '', cuidado && canteiro.aula ? 'Toque em Como cuidar.' : '']
+    .filter(Boolean)
+    .join(' ')
 
   return (
-    <li className={`cartao overflow-hidden ${canteiro.estado === 'cuidado' ? estado.borda : ''}`}>
-      <button
-        type="button"
-        onClick={() => dizer(`${canteiro.nome}. ${falaEstado}`)}
-        className="flex w-full items-center gap-4 p-4 text-left"
-      >
-        <span aria-hidden="true" className="text-7xl leading-none">
-          {canteiro.figura}
-        </span>
-        <span className="flex flex-col items-start gap-2">
-          <span className="font-titulo text-3xl leading-none font-bold">{canteiro.nome}</span>
-          <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-lg font-bold ${estado.classe}`}>
-            <estado.Icone aria-hidden="true" className="size-5" />
-            {estado.texto}
+    <li className={`cartao overflow-hidden ${cuidado ? estado.borda : ''}`}>
+      <CartaoFalante fala={fala} className="p-4 pr-12">
+        <span className="flex items-center gap-3">
+          <span aria-hidden="true" className="text-6xl leading-none">
+            {canteiro.figura}
+          </span>
+          <span className="flex flex-col items-start gap-2">
+            <span className="font-titulo text-3xl leading-none font-bold">{canteiro.nome}</span>
+            <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-lg font-bold whitespace-nowrap ${estado.classe}`}>
+              <estado.Icone aria-hidden="true" className="size-5" />
+              {estado.texto}
+            </span>
           </span>
         </span>
-      </button>
+      </CartaoFalante>
 
-      {canteiro.estado === 'cuidado' && canteiro.aula && (
+      {cuidado && (
         <div className="px-4 pb-5">
-          <button
-            type="button"
-            onClick={() => ir('aprender', canteiro.aula)}
-            className="apertar flex min-h-16 w-full items-center justify-center gap-2 bg-vermelho px-5 text-xl font-bold text-white"
-          >
-            <PiFirstAidKitFill aria-hidden="true" className="size-7" />
-            Como cuidar
-          </button>
+          {canteiro.aviso && (
+            <p className="mb-4 flex items-center gap-2 rounded-2xl bg-vermelho/10 px-4 py-3 text-xl font-bold">
+              <PiVideoCameraFill aria-hidden="true" className="size-6 shrink-0 text-vermelho" />
+              {canteiro.aviso}
+            </p>
+          )}
+          {canteiro.aula && (
+            <button
+              type="button"
+              onClick={() => ir('aprender', canteiro.aula)}
+              className="apertar flex min-h-16 w-full items-center justify-center gap-2 bg-vermelho px-5 text-xl font-bold text-white"
+            >
+              <PiFirstAidKitFill aria-hidden="true" className="size-7" />
+              Como cuidar
+            </button>
+          )}
         </div>
       )}
     </li>
   )
 }
+
+/* O que precisa de cuidado aparece primeiro; depois o que pode colher. */
+const ordem = { cuidado: 0, colher: 1, crescendo: 2 }
+const porUrgencia = (a, b) => ordem[a.estado] - ordem[b.estado]
 
 export default function Horta({ ir }) {
   const { dizer } = useAudioDescricao()
@@ -64,8 +78,8 @@ export default function Horta({ ir }) {
   const [situacao, setSituacao] = useState('nada') // 'nada' | 'olhando' | 'pronto'
   const relogio = useRef(null)
 
-  const venda = canteiros.filter((c) => c.destino === 'venda')
-  const daComunidade = canteiros.filter((c) => c.destino === 'comunidade')
+  const venda = canteiros.filter((c) => c.destino === 'venda').sort(porUrgencia)
+  const daComunidade = canteiros.filter((c) => c.destino === 'comunidade').sort(porUrgencia)
 
   // Limpa a foto e o relógio quando sai da tela ou troca de foto.
   useEffect(() => () => clearTimeout(relogio.current), [])
@@ -85,7 +99,8 @@ export default function Horta({ ir }) {
     }, 1500)
   }
 
-  const resumoCanteiros = (lista) => lista.map((c) => `${c.nome}, ${estados[c.estado].texto}`).join('. ')
+  const resumoCanteiros = (lista) =>
+    lista.map((c) => `${c.nome}, ${estados[c.estado].texto}${c.aviso ? `. ${c.aviso}` : ''}`).join('. ')
   const descricaoFoto =
     situacao === 'pronto'
       ? `Resposta da foto: ${respostaFoto.titulo}. ${respostaFoto.texto} Embaixo tem o botão Como cuidar.`
@@ -149,7 +164,7 @@ export default function Horta({ ir }) {
         <p className="text-xl text-texto/80">Estes você vende. Eles pagam a casa e a bomba.</p>
         <ul className="mt-4 flex flex-col gap-4">
           {venda.map((c) => (
-            <Canteiro key={c.id} canteiro={c} ir={ir} dizer={dizer} />
+            <Canteiro key={c.id} canteiro={c} ir={ir} />
           ))}
         </ul>
 
@@ -157,7 +172,7 @@ export default function Horta({ ir }) {
         <p className="text-xl text-texto/80">Estes são para dar às famílias.</p>
         <ul className="mt-4 flex flex-col gap-4">
           {daComunidade.map((c) => (
-            <Canteiro key={c.id} canteiro={c} ir={ir} dizer={dizer} />
+            <Canteiro key={c.id} canteiro={c} ir={ir} />
           ))}
         </ul>
       </div>

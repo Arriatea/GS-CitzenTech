@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { PiArrowLeftBold, PiArrowRightBold, PiCheckBold } from 'react-icons/pi'
+import { PiArrowLeftBold, PiArrowRightBold, PiCheckBold, PiCheckCircleFill } from 'react-icons/pi'
 import Topo, { coresSecao } from '../components/Topo.jsx'
 import { cursos } from '../data/mock.js'
 import { useDescricao } from '../lib/AudioDescricao.jsx'
+import { gravar, ler, vibrar } from '../lib/guardar.js'
 
 const corPreenchida = {
   laranja: 'bg-laranja',
@@ -12,10 +13,10 @@ const corPreenchida = {
   vermelho: 'bg-vermelho',
 }
 
-function Lista({ ir, abrir }) {
+function Lista({ ir, feitas }) {
   useDescricao(
     `Você está em Aprender. No alto tem o botão Início. Tem ${cursos.length} aulas: ${cursos
-      .map((c) => `${c.titulo}, ${c.passos.length} passos`)
+      .map((c) => `${c.titulo}, ${c.passos.length} passos${feitas.includes(c.id) ? ', já feita' : ''}`)
       .join('. ')}. Toque numa aula para começar.`,
     'lista',
   )
@@ -25,29 +26,39 @@ function Lista({ ir, abrir }) {
       <Topo cor="azul" figura="📖" titulo="Aprender" aoVoltar={() => ir('inicio')} />
 
       <ul className="mt-6 flex flex-col gap-5 px-4">
-        {cursos.map((curso) => (
-          <li key={curso.id}>
-            <button
-              type="button"
-              onClick={() => abrir(curso.id)}
-              className={`apertar flex min-h-24 w-full items-center gap-4 rounded-[26px]! p-4 text-left ${coresSecao[curso.cor]}`}
-            >
-              <span aria-hidden="true" className="grid size-20 shrink-0 place-items-center rounded-full bg-white text-5xl">
-                {curso.figura}
-              </span>
-              <span className="flex flex-col">
-                <span className="font-titulo text-3xl leading-tight font-bold">{curso.titulo}</span>
-                <span className="text-xl">{curso.passos.length} passos</span>
-              </span>
-            </button>
-          </li>
-        ))}
+        {cursos.map((curso) => {
+          const feita = feitas.includes(curso.id)
+          return (
+            <li key={curso.id}>
+              <button
+                type="button"
+                onClick={() => ir('aprender', curso.id)}
+                className={`apertar flex min-h-24 w-full items-center gap-4 rounded-[26px]! p-4 text-left ${coresSecao[curso.cor]}`}
+              >
+                <span aria-hidden="true" className="grid size-20 shrink-0 place-items-center rounded-full bg-white text-5xl">
+                  {curso.figura}
+                </span>
+                <span className="flex flex-col items-start">
+                  <span className="font-titulo text-3xl leading-tight font-bold">{curso.titulo}</span>
+                  {feita ? (
+                    <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-0.5 text-lg font-bold text-texto">
+                      <PiCheckCircleFill aria-hidden="true" className="size-5 text-verde" />
+                      Feita
+                    </span>
+                  ) : (
+                    <span className="text-xl">{curso.passos.length} passos</span>
+                  )}
+                </span>
+              </button>
+            </li>
+          )
+        })}
       </ul>
     </div>
   )
 }
 
-function Aula({ curso, voltar }) {
+function Aula({ curso, voltar, aoTerminar }) {
   const [passo, setPasso] = useState(0)
   const [fim, setFim] = useState(false)
   const total = curso.passos.length
@@ -64,8 +75,11 @@ function Aula({ curso, voltar }) {
   )
 
   function avancar() {
-    if (ultimo) setFim(true)
-    else setPasso(passo + 1)
+    vibrar()
+    if (ultimo) {
+      setFim(true)
+      aoTerminar(curso.id)
+    } else setPasso(passo + 1)
     window.scrollTo(0, 0)
   }
 
@@ -88,6 +102,16 @@ function Aula({ curso, voltar }) {
             >
               Ver outras aulas
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setFim(false)
+                setPasso(0)
+              }}
+              className="apertar mt-4 min-h-16 w-full border-4 border-nuvem bg-white px-5 text-xl font-bold"
+            >
+              Ver esta aula de novo
+            </button>
           </section>
         ) : (
           <>
@@ -106,7 +130,7 @@ function Aula({ curso, voltar }) {
               </div>
             </div>
 
-            <section key={passo} aria-live="polite" className="cartao surgir mt-5 p-6">
+            <section key={passo} className="cartao surgir mt-5 p-6">
               <p aria-hidden="true" className="text-8xl leading-none">
                 {atual.figura}
               </p>
@@ -148,15 +172,18 @@ function Aula({ curso, voltar }) {
   )
 }
 
-export default function Aprender({ ir, aulaInicial }) {
-  const [aulaId, setAulaId] = useState(() => (cursos.some((c) => c.id === aulaInicial) ? aulaInicial : null))
-  const curso = cursos.find((c) => c.id === aulaId)
+/* A aula aberta vem da âncora: #aprender/pulgao. Sem detalhe, mostra a lista. */
+export default function Aprender({ ir, detalhe }) {
+  const [feitas, setFeitas] = useState(() => ler('aulas-feitas', []))
+  const curso = cursos.find((c) => c.id === detalhe)
 
-  function trocar(id) {
-    setAulaId(id)
-    window.scrollTo(0, 0)
+  function marcarFeita(id) {
+    if (feitas.includes(id)) return
+    const novas = [...feitas, id]
+    setFeitas(novas)
+    gravar('aulas-feitas', novas)
   }
 
-  if (curso) return <Aula key={curso.id} curso={curso} voltar={() => trocar(null)} />
-  return <Lista ir={ir} abrir={trocar} />
+  if (curso) return <Aula curso={curso} voltar={() => ir('aprender')} aoTerminar={marcarFeita} />
+  return <Lista ir={ir} feitas={feitas} />
 }
