@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { PiCheckBold, PiDropFill, PiQuestionBold } from 'react-icons/pi'
+import { PiCheckBold, PiQuestionBold } from 'react-icons/pi'
+import CaixaDagua from '../components/CaixaDagua.jsx'
 import { agua, tarefas, usuaria } from '../data/mock.js'
 import { useAudioDescricao, useDescricao } from '../lib/AudioDescricao.jsx'
 
@@ -44,6 +45,46 @@ function Bandeirolas() {
   )
 }
 
+/* Marca: uma gota com o sol dentro (a bomba do poço é solar). */
+function Marca() {
+  return (
+    <p className="mt-2 flex items-center gap-2 font-titulo text-2xl font-bold">
+      <svg viewBox="0 0 24 30" className="h-7 w-auto" aria-hidden="true" focusable="false">
+        <path d="M12 1 C12 1 2 13 2 19.5 A10 10 0 0 0 22 19.5 C22 13 12 1 12 1 Z" fill="#1f6fe0" />
+        <circle cx="12" cy="19.5" r="4.2" fill="#ffc21f" />
+      </svg>
+      Gota a Gota
+    </p>
+  )
+}
+
+/* As tarefas do dia em fila: a feita ganha ✓, a de agora fica marcada. */
+function FilaDeTarefas({ atual }) {
+  return (
+    <ol aria-hidden="true" className="flex gap-2">
+      {tarefas.map((t, i) => {
+        const feita = i < atual
+        const agora = i === atual
+        return (
+          <li
+            key={t.id}
+            className={`relative grid size-12 place-items-center rounded-xl text-2xl ${
+              agora ? 'bg-white ring-4 ring-texto' : feita ? 'bg-verde/15' : 'bg-nuvem'
+            }`}
+          >
+            <span className={feita ? 'opacity-40' : ''}>{t.figura}</span>
+            {feita && (
+              <span className="absolute -right-1.5 -bottom-1.5 grid size-6 place-items-center rounded-full bg-verde text-white ring-3 ring-white">
+                <PiCheckBold className="size-4" />
+              </span>
+            )}
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
 const secoes = [
   { destino: 'horta', figura: '🌱', rotulo: 'Minha horta', classe: 'bg-laranja text-white' },
   { destino: 'aprender', figura: '📖', rotulo: 'Aprender', classe: 'bg-azul text-white' },
@@ -84,26 +125,22 @@ export default function Inicio({ ir }) {
       <Bandeirolas />
 
       <div className="px-4">
-        <p className="mt-3 font-titulo text-2xl font-bold">
-          <span aria-hidden="true">☀️ </span>Gota a Gota
-        </p>
+        <Marca />
         <h1 className="mt-1 text-5xl font-extrabold">{ola}</h1>
 
-        {/* Água */}
+        {/* Água: a caixa desenhada com o nível, e as palavras ao lado */}
         <section
           aria-label="Água"
-          className={`mt-6 rounded-[32px] p-6 text-white ${agua.boa ? 'bg-verde' : 'bg-vermelho'}`}
+          className={`mt-7 rounded-[32px] px-6 pt-6 pb-5 text-white ${agua.boa ? 'bg-verde' : 'bg-vermelho'}`}
         >
-          <div className="flex items-center gap-4">
-            <span className="grid size-20 shrink-0 place-items-center rounded-full bg-white">
-              <PiDropFill aria-hidden="true" className={`size-12 ${agua.boa ? 'text-verde' : 'text-vermelho'}`} />
-            </span>
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-4xl font-extrabold">{agua.boa ? 'Água boa' : 'Água ruim'}</h2>
-              <p className="text-2xl font-extrabold">{textoCaixa[agua.caixa]}</p>
+              <h2 className="text-[2.5rem] font-extrabold whitespace-nowrap">{agua.boa ? 'Água boa' : 'Água ruim'}</h2>
+              <p className="mt-1 text-xl font-bold">{textoCaixa[agua.caixa]}</p>
             </div>
+            <CaixaDagua caixa={agua.caixa} className="h-28 w-auto shrink-0" />
           </div>
-          <p className="mt-4 text-xl font-bold">
+          <p className="mt-4 border-t-2 border-white/30 pt-4 text-xl">
             {agua.boa
               ? `Se o carro-pipa atrasar, tem água para beber por ${dias}.`
               : 'Não beba a água do poço agora.'}
@@ -111,37 +148,46 @@ export default function Inicio({ ir }) {
         </section>
 
         {/* Uma tarefa por vez */}
-        <section aria-label="Tarefa de hoje" className="cartao mt-6 p-6">
+        <section aria-label="Tarefa de hoje" className="cartao mt-6 p-5">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-3xl font-bold whitespace-nowrap">Para hoje</h2>
+            <FilaDeTarefas atual={indice} />
+          </div>
+
           {tudoFeito ? (
-            <div key="fim" className="surgir">
-              <p className="text-7xl" aria-hidden="true">
+            <div key="fim" className="surgir mt-6">
+              <p className="text-7xl leading-none" aria-hidden="true">
                 🎉
               </p>
-              <h2 className="mt-3 text-4xl font-extrabold">Tudo feito!</h2>
+              <p className="mt-3 font-titulo text-4xl font-extrabold">Tudo feito!</p>
               <button
                 type="button"
                 onClick={() => setIndice(0)}
-                className="apertar mt-6 min-h-16 w-full border-4 border-nuvem bg-white px-5 text-xl font-extrabold"
+                className="apertar mt-6 min-h-16 w-full border-4 border-nuvem bg-white px-5 text-xl font-bold"
               >
                 Ver de novo
               </button>
             </div>
           ) : (
-            <div key={tarefa.id} className="surgir">
-              <p className="text-xl font-extrabold text-texto/70">
-                Hoje · {indice + 1} de {tarefas.length}
+            <div key={tarefa.id} className="surgir mt-5">
+              <div className="flex items-start gap-4">
+                <span aria-hidden="true" className="text-7xl leading-none">
+                  {tarefa.figura}
+                </span>
+                <div>
+                  <p className="font-titulo text-3xl leading-tight font-bold">{tarefa.texto}</p>
+                  <p className="mt-1 text-xl text-texto/80">{tarefa.dica}</p>
+                </div>
+              </div>
+              <p className="sr-only">
+                Tarefa {indice + 1} de {tarefas.length}.
               </p>
-              <p className="mt-3 text-7xl leading-none" aria-hidden="true">
-                {tarefa.figura}
-              </p>
-              <h2 className="mt-4 text-3xl font-extrabold">{tarefa.texto}</h2>
-              <p className="mt-1 text-xl">{tarefa.dica}</p>
 
-              <div className="mt-6 flex flex-col gap-4">
+              <div className="mt-6 flex gap-3">
                 <button
                   type="button"
                   onClick={jaFiz}
-                  className="apertar flex min-h-16 w-full items-center justify-center gap-2 bg-verde px-5 text-2xl font-extrabold text-white"
+                  className="apertar flex min-h-16 flex-1 items-center justify-center gap-2 bg-verde px-5 text-2xl font-extrabold text-white"
                 >
                   <PiCheckBold aria-hidden="true" className="size-7" />
                   Já fiz
@@ -150,9 +196,9 @@ export default function Inicio({ ir }) {
                   <button
                     type="button"
                     onClick={() => ir('aprender', tarefa.aula)}
-                    className="apertar flex min-h-16 w-full items-center justify-center gap-2 border-4 border-nuvem bg-white px-5 text-xl font-extrabold"
+                    className="apertar flex min-h-16 items-center justify-center gap-2 border-4 border-nuvem bg-white px-4 text-xl font-bold"
                   >
-                    <PiQuestionBold aria-hidden="true" className="size-7" />
+                    <PiQuestionBold aria-hidden="true" className="size-6" />
                     Como faz?
                   </button>
                 )}
@@ -168,7 +214,7 @@ export default function Inicio({ ir }) {
               key={s.destino}
               type="button"
               onClick={() => ir(s.destino)}
-              className={`apertar flex min-h-24 w-full items-center gap-4 rounded-[28px]! px-6 text-left font-titulo text-4xl font-extrabold ${s.classe}`}
+              className={`apertar flex min-h-24 w-full items-center gap-4 rounded-[26px]! px-6 text-left font-titulo text-4xl font-extrabold ${s.classe}`}
             >
               <span aria-hidden="true" className="text-5xl">
                 {s.figura}
@@ -185,7 +231,7 @@ export default function Inicio({ ir }) {
               e.preventDefault()
               ir('parceiro')
             }}
-            className="text-lg font-bold text-texto/75 underline underline-offset-4"
+            className="text-lg text-texto/75 underline underline-offset-4"
           >
             Sou de uma iniciativa parceira
           </a>

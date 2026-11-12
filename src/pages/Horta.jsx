@@ -34,8 +34,8 @@ function Canteiro({ canteiro, ir, dizer }) {
           {canteiro.figura}
         </span>
         <span className="flex flex-col items-start gap-2">
-          <span className="font-titulo text-3xl font-extrabold">{canteiro.nome}</span>
-          <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-lg font-extrabold ${estado.classe}`}>
+          <span className="font-titulo text-3xl leading-none font-bold">{canteiro.nome}</span>
+          <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-lg font-bold ${estado.classe}`}>
             <estado.Icone aria-hidden="true" className="size-5" />
             {estado.texto}
           </span>
@@ -47,7 +47,7 @@ function Canteiro({ canteiro, ir, dizer }) {
           <button
             type="button"
             onClick={() => ir('aprender', canteiro.aula)}
-            className="apertar flex min-h-16 w-full items-center justify-center gap-2 bg-vermelho px-5 text-xl font-extrabold text-white"
+            className="apertar flex min-h-16 w-full items-center justify-center gap-2 bg-vermelho px-5 text-xl font-bold text-white"
           >
             <PiFirstAidKitFill aria-hidden="true" className="size-7" />
             Como cuidar
@@ -104,7 +104,7 @@ export default function Horta({ ir }) {
       <Topo cor="laranja" figura="🌱" titulo="Minha horta" aoVoltar={() => ir('inicio')} />
 
       <div className="px-4">
-        <label className="apertar mt-6 flex min-h-24 w-full items-center justify-center gap-3 rounded-[28px]! bg-texto px-6 font-titulo text-3xl font-extrabold text-white focus-within:outline-4 focus-within:outline-offset-3 focus-within:outline-texto">
+        <label className="apertar mt-6 flex min-h-24 w-full items-center justify-center gap-3 rounded-[26px]! bg-texto px-6 font-titulo text-3xl font-bold text-white focus-within:outline-4 focus-within:outline-offset-3 focus-within:outline-texto">
           <PiCameraFill aria-hidden="true" className="size-10" />
           Tirar foto da planta
           <input type="file" accept="image/*" capture="environment" onChange={aoEscolherFoto} className="sr-only" />
@@ -115,7 +115,7 @@ export default function Horta({ ir }) {
             <img src={foto} alt="A foto que você tirou" className="h-60 w-full object-cover" />
             <div className="p-5" aria-live="polite">
               {situacao === 'olhando' ? (
-                <p className="flex items-center gap-3 font-titulo text-3xl font-extrabold">
+                <p className="flex items-center gap-3 font-titulo text-3xl font-bold">
                   <span aria-hidden="true" className="pulsar">
                     👀
                   </span>
@@ -131,12 +131,12 @@ export default function Horta({ ir }) {
                   <button
                     type="button"
                     onClick={() => ir('aprender', respostaFoto.aula)}
-                    className="apertar mt-5 flex min-h-16 w-full items-center justify-center gap-2 bg-vermelho px-5 text-xl font-extrabold text-white"
+                    className="apertar mt-5 flex min-h-16 w-full items-center justify-center gap-2 bg-vermelho px-5 text-xl font-bold text-white"
                   >
                     <PiFirstAidKitFill aria-hidden="true" className="size-7" />
                     Como cuidar
                   </button>
-                  <p className="mt-4 text-base font-semibold text-texto/70">
+                  <p className="mt-4 text-base font-medium text-texto/70">
                     Exemplo de resposta. No app de verdade, quem responde é a IA.
                   </p>
                 </div>
@@ -145,18 +145,16 @@ export default function Horta({ ir }) {
           </section>
         )}
 
-        <h2 className="mt-10 text-4xl font-extrabold">
-          <span aria-hidden="true">💰 </span>Para vender
-        </h2>
+        <h2 className="mt-10 text-4xl font-extrabold">Para vender</h2>
+        <p className="text-xl text-texto/80">Estes você vende. Eles pagam a casa e a bomba.</p>
         <ul className="mt-4 flex flex-col gap-4">
           {venda.map((c) => (
             <Canteiro key={c.id} canteiro={c} ir={ir} dizer={dizer} />
           ))}
         </ul>
 
-        <h2 className="mt-10 text-4xl font-extrabold">
-          <span aria-hidden="true">🤝 </span>Para a comunidade
-        </h2>
+        <h2 className="mt-10 text-4xl font-extrabold">Para a comunidade</h2>
+        <p className="text-xl text-texto/80">Estes são para dar às famílias.</p>
         <ul className="mt-4 flex flex-col gap-4">
           {daComunidade.map((c) => (
             <Canteiro key={c.id} canteiro={c} ir={ir} dizer={dizer} />

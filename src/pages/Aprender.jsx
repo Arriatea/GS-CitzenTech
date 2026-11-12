@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PiArrowLeftBold } from 'react-icons/pi'
+import { PiArrowLeftBold, PiArrowRightBold, PiCheckBold } from 'react-icons/pi'
 import Topo, { coresSecao } from '../components/Topo.jsx'
 import { cursos } from '../data/mock.js'
 import { useDescricao } from '../lib/AudioDescricao.jsx'
@@ -30,14 +30,14 @@ function Lista({ ir, abrir }) {
             <button
               type="button"
               onClick={() => abrir(curso.id)}
-              className={`apertar flex min-h-24 w-full items-center gap-4 rounded-[28px]! p-4 text-left ${coresSecao[curso.cor]}`}
+              className={`apertar flex min-h-24 w-full items-center gap-4 rounded-[26px]! p-4 text-left ${coresSecao[curso.cor]}`}
             >
               <span aria-hidden="true" className="grid size-20 shrink-0 place-items-center rounded-full bg-white text-5xl">
                 {curso.figura}
               </span>
               <span className="flex flex-col">
-                <span className="font-titulo text-3xl leading-tight font-extrabold">{curso.titulo}</span>
-                <span className="text-xl font-bold">{curso.passos.length} passos</span>
+                <span className="font-titulo text-3xl leading-tight font-bold">{curso.titulo}</span>
+                <span className="text-xl">{curso.passos.length} passos</span>
               </span>
             </button>
           </li>
@@ -84,7 +84,7 @@ function Aula({ curso, voltar }) {
             <button
               type="button"
               onClick={voltar}
-              className="apertar mt-6 min-h-16 w-full bg-azul px-5 text-2xl font-extrabold text-white"
+              className="apertar mt-6 min-h-16 w-full bg-azul px-5 text-2xl font-bold text-white"
             >
               Ver outras aulas
             </button>
@@ -93,7 +93,7 @@ function Aula({ curso, voltar }) {
           <>
             {/* Progresso: segmentos coloridos e também em palavras */}
             <div className="mt-6">
-              <p className="text-xl font-extrabold text-texto/75">
+              <p className="text-xl font-bold text-texto/75">
                 Passo {passo + 1} de {total}
               </p>
               <div aria-hidden="true" className="mt-2 flex gap-2">
@@ -126,9 +126,19 @@ function Aula({ curso, voltar }) {
               <button
                 type="button"
                 onClick={avancar}
-                className="apertar min-h-16 flex-1 bg-verde px-5 text-2xl font-extrabold text-white"
+                className="apertar flex min-h-16 flex-1 items-center justify-center gap-2 bg-verde px-5 text-2xl font-extrabold text-white"
               >
-                {ultimo ? '✓ Terminei' : 'Próximo →'}
+                {ultimo ? (
+                  <>
+                    <PiCheckBold aria-hidden="true" className="size-7" />
+                    Terminei
+                  </>
+                ) : (
+                  <>
+                    Próximo
+                    <PiArrowRightBold aria-hidden="true" className="size-7" />
+                  </>
+                )}
               </button>
             </div>
           </>

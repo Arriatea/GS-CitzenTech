@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { PiCheckCircleFill } from 'react-icons/pi'
+import { PiCalendarBlankFill, PiCheckCircleFill } from 'react-icons/pi'
 import Topo from '../components/Topo.jsx'
 import { compradores, precos } from '../data/mock.js'
 import { useAudioDescricao, useDescricao } from '../lib/AudioDescricao.jsx'
@@ -45,7 +45,7 @@ export default function Vender({ ir }) {
 
       <div className="px-4">
         <h2 className="mt-6 text-4xl font-extrabold">Quanto cobrar?</h2>
-        <p className="mt-1 text-xl">Toque na verdura.</p>
+        <p className="mt-1 text-xl text-texto/80">Toque na verdura.</p>
 
         <div role="radiogroup" aria-label="Escolha a verdura" className="mt-4 grid grid-cols-4 gap-3">
           {precos.map((p, i) => {
@@ -76,15 +76,19 @@ export default function Vender({ ir }) {
           })}
         </div>
 
-        <section aria-live="polite" aria-label="Preço mínimo" className="mt-6 rounded-[32px] bg-amarelo p-6 text-texto">
-          <p className="text-2xl font-extrabold">
-            {preco.nome}, {preco.unidade}:
-          </p>
-          <p key={preco.id} className="surgir font-titulo text-7xl leading-none font-extrabold tabular-nums">
-            {formatarPreco(preco.valor)}
-          </p>
-          <p className="mt-3 text-2xl font-extrabold">Não venda mais barato que isso.</p>
-          <p className="mt-4 border-t-4 border-texto/15 pt-3 text-lg font-bold">
+        {/* O preço como a plaquinha de uma banca de feira. */}
+        <section aria-live="polite" aria-label="Preço mínimo" className="mt-7">
+          <div className="plaquinha -rotate-1 bg-amarelo py-6 pr-6 pl-14 text-texto">
+            <span aria-hidden="true" className="absolute top-1/2 left-6 size-5 -translate-y-1/2 rounded-full bg-fundo ring-3 ring-texto/60" />
+            <p className="text-2xl font-bold">
+              {preco.nome}, {preco.unidade}:
+            </p>
+            <p key={preco.id} className="surgir mt-1 font-titulo text-7xl leading-none font-extrabold tabular-nums">
+              {formatarPreco(preco.valor)}
+            </p>
+            <p className="mt-3 text-2xl font-extrabold">Não venda mais barato que isso.</p>
+          </div>
+          <p className="mt-4 text-lg text-texto/80">
             O app calcula esse preço com o que você gastou e com o preço da região.
           </p>
         </section>
@@ -101,10 +105,12 @@ export default function Vender({ ir }) {
                 <span aria-hidden="true" className="text-6xl leading-none">
                   {c.figura}
                 </span>
-                <span className="flex flex-col">
-                  <span className="font-titulo text-3xl leading-tight font-extrabold">{c.nome}</span>
-                  <span className="text-xl">
-                    Quer: {c.quer} · {maiuscula(c.quando)}
+                <span className="flex flex-col gap-1">
+                  <span className="font-titulo text-3xl leading-tight font-bold">{c.nome}</span>
+                  <span className="text-xl">Quer {c.quer}</span>
+                  <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-nuvem px-3 py-0.5 text-lg font-bold">
+                    <PiCalendarBlankFill aria-hidden="true" className="size-5" />
+                    {maiuscula(c.quando)}
                   </span>
                 </span>
               </button>
