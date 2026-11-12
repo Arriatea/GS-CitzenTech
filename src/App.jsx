@@ -7,28 +7,30 @@ import Aprender from './pages/Aprender.jsx'
 import Vender from './pages/Vender.jsx'
 import Parceiro from './pages/Parceiro.jsx'
 
-/* Navegação pela âncora da URL (#inicio, #horta...), sem biblioteca de rotas. */
+/*
+ * Navegação pela âncora da URL, sem biblioteca de rotas.
+ * Formato: #tela ou #tela/detalhe (ex.: #aprender/pulgao, #parceiro/angelica).
+ */
 const telas = { inicio: Inicio, horta: Horta, aprender: Aprender, vender: Vender, parceiro: Parceiro }
 
 function lerAncora() {
-  const ancora = window.location.hash.replace('#', '')
-  return ancora in telas ? ancora : 'inicio'
+  const [tela = '', detalhe = null] = decodeURIComponent(window.location.hash.replace('#', '')).split('/')
+  return tela in telas ? { tela, detalhe: detalhe || null } : { tela: 'inicio', detalhe: null }
 }
 
 function Navegacao() {
   const { parar } = useAudioDescricao()
-  const [tela, setTela] = useState(lerAncora)
-  const [aulaId, setAulaId] = useState(null)
+  const [local, setLocal] = useState(lerAncora)
   const principal = useRef(null)
   const primeiraTela = useRef(true)
 
   const ir = useCallback(
-    (destino, aula = null) => {
+    (destino, detalhe = null) => {
+      const tela = destino in telas ? destino : 'inicio'
       parar()
-      setTela(destino in telas ? destino : 'inicio')
-      setAulaId(aula)
+      setLocal({ tela, detalhe })
       window.scrollTo(0, 0)
-      window.history.replaceState(null, '', `#${destino}`)
+      window.history.replaceState(null, '', `#${tela}${detalhe ? `/${detalhe}` : ''}`)
     },
     [parar],
   )
@@ -37,8 +39,7 @@ function Navegacao() {
   useEffect(() => {
     const aoMudar = () => {
       parar()
-      setTela(lerAncora())
-      setAulaId(null)
+      setLocal(lerAncora())
       window.scrollTo(0, 0)
     }
     window.addEventListener('hashchange', aoMudar)
@@ -52,16 +53,16 @@ function Navegacao() {
       return
     }
     principal.current?.focus({ preventScroll: true })
-  }, [tela, aulaId])
+  }, [local])
 
-  const Tela = telas[tela]
+  const Tela = telas[local.tela]
 
   return (
     <>
       <main ref={principal} tabIndex={-1} className="outline-none">
-        <Tela key={`${tela}-${aulaId ?? ''}`} ir={ir} aulaInicial={aulaId} />
+        <Tela key={`${local.tela}-${local.detalhe ?? ''}`} ir={ir} detalhe={local.detalhe} />
       </main>
-      <BotaoAudio largo={tela === 'parceiro'} />
+      <BotaoAudio largo={local.tela === 'parceiro'} />
     </>
   )
 }

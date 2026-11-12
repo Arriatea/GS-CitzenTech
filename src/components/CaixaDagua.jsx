@@ -1,7 +1,10 @@
+import { useId } from 'react'
+
 /*
  * Desenho da caixa d'água de polietileno, com o nível pintado.
- * É figura (não é gráfico): a pessoa vê a caixa cheia, pela metade ou com pouca água.
+ * Para a família é figura (não é gráfico): a caixa cheia, pela metade ou com pouca água.
  * O texto ao lado sempre diz o mesmo em palavras.
+ * No painel da ONG, `pct` (0 a 100) pinta o nível exato.
  */
 
 const nivel = { cheia: 0.84, metade: 0.5, pouca: 0.2 }
@@ -9,26 +12,24 @@ const nivel = { cheia: 0.84, metade: 0.5, pouca: 0.2 }
 // Corpo levemente afunilado, como as caixas azuis do sertão.
 const corpo = 'M13 34 H87 L81 106 Q80 113 73 113 H27 Q20 113 19 106 Z'
 
-export default function CaixaDagua({ caixa = 'cheia', className = '' }) {
-  const altura = nivel[caixa] ?? 0.5
+export default function CaixaDagua({ caixa = 'cheia', pct, className = '', corAgua = '#1f6fe0' }) {
+  const recorte = useId()
+  const altura = typeof pct === 'number' ? Math.max(0, Math.min(100, pct)) / 100 : (nivel[caixa] ?? 0.5)
   const fundo = 113
   const topoAgua = fundo - (fundo - 36) * altura
 
   return (
     <svg viewBox="0 0 100 120" className={className} aria-hidden="true" focusable="false">
       <defs>
-        <clipPath id="corpo-da-caixa">
+        <clipPath id={recorte}>
           <path d={corpo} />
         </clipPath>
       </defs>
 
       <path d={corpo} fill="#fff" />
 
-      <g clipPath="url(#corpo-da-caixa)">
-        <path
-          d={`M0 ${topoAgua} q8 -5 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 V120 H0 Z`}
-          fill="#1f6fe0"
-        />
+      <g clipPath={`url(#${recorte})`}>
+        <path d={`M0 ${topoAgua} q8 -5 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0 V120 H0 Z`} fill={corAgua} />
         <path
           d={`M0 ${topoAgua + 7} q8 -4 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0`}
           fill="none"
