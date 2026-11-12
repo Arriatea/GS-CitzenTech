@@ -169,7 +169,7 @@ export default function Horta({ ir }) {
         </ul>
 
         <h2 className="mt-10 text-4xl font-extrabold">Para a comunidade</h2>
-        <p className="text-xl text-texto/80">Estes são para dar às famílias.</p>
+        <p className="text-xl text-texto/80">Comida para as famílias da comunidade.</p>
         <ul className="mt-4 flex flex-col gap-4">
           {daComunidade.map((c) => (
             <Canteiro key={c.id} canteiro={c} ir={ir} />

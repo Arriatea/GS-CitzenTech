@@ -5,7 +5,7 @@
 Plataforma para comunidades rurais do semiárido do Rio Grande do Norte que receberam um poço
 (inspirada no projeto Leve Poços, Comunidade Angélica, Ipanguaçu/RN). O app cuida do "depois do poço":
 mostra o estado da água, orienta a horta, ensina a plantar e a vender, mostra o preço mínimo de venda
-e conecta as famílias aos compradores. As ONGs que acompanham as comunidades veem a caixa d'água,
+e conecta as famílias aos compradores. A ONG que acompanha as comunidades vê a caixa d'água,
 a bomba solar, a qualidade da água e a saúde da horta pelas câmeras.
 
 Este repositório tem o **front-end**. Todos os dados ainda são **simulados**.
@@ -33,25 +33,33 @@ Sem biblioteca de rotas: a navegação usa a âncora da URL (`#tela` ou `#tela/d
 | `#aprender`         | Aprender    | Lista de aulas (as terminadas aparecem como "Feita"). `#aprender/pulgao` abre direto uma aula.               |
 | `#vender`           | Vender      | Preço mínimo em formato de plaquinha de feira, a conta "quantos vai vender" e quem compra.                   |
 
-## Área das ONGs (`#parceiro`)
+## Área da ONG (`#parceiro`)
 
-Para quem acompanha as comunidades (público técnico, aqui pode ter números).
+Para a ONG que acompanha as comunidades (público técnico, aqui pode ter números).
 
-- **Entrar como ONG**: cada ONG vê **só as comunidades que acompanha** (acesso simulado; no sistema real é login).
-  A ONG escolhida fica guardada no aparelho.
-- **Comunidades**: primeiro a lista de alertas (urgente antes de atenção), depois um cartão por comunidade com
-  nível da caixa (% e litros), dias de água para beber, bomba solar, qualidade da água e câmeras.
-  Filtros por situação: precisam de visita, atenção, tudo certo.
+- **Uma ONG só.** O app atende uma única ONG: quem entra em `#parceiro` vê direto as comunidades dela.
+  Não existe tela para escolher nem para trocar de ONG, e uma ONG não tem como ver os dados de outra.
+  No sistema real, o login define a ONG e a API só devolve as comunidades dela.
+- **Comunidades**: agrupadas por situação (precisam de visita, atenção, tudo certo). Cada comunidade é uma linha
+  com os mesmos quatro indicadores, sempre na mesma ordem (caixa d'água, bomba solar, água, câmeras), cada um com
+  cor e palavra, e embaixo o que é preciso resolver nela, em poucas palavras.
 - **Comunidade** (`#parceiro/angelica`):
+  - No alto, os mesmos quatro indicadores e um bloco **O que resolver**, com cada item levando à parte certa da página.
   - **Caixa d'água**: nível, litros, reserva para beber, bomba solar (ligada, parada por falta de sol ou falha),
     de onde a horta tira água agora, último teste da água, gráfico dos últimos 7 dias com a linha de alerta
     e o que aconteceu (carro-pipa, dias sem sol, testes).
-  - **Horta pelas câmeras**: a última foto de cada câmera, com o quadrado onde a IA viu o problema e a certeza dela.
+  - **Horta pelas câmeras** (as com problema primeiro): a última foto de cada câmera, com o quadrado onde a IA viu o problema e a certeza dela.
     Ações: "Enviar orientação à família" (a família recebe a aula no app) e "Marcar visita técnica".
-- Uma ONG não abre comunidade de outra ONG, nem pela âncora.
 
 As regras de alerta ficam em `src/pages/parceiro/situacao.js` (caixa abaixo de 30% é urgente, bomba que não liga
 com sol, água fora do padrão, câmera com alerta ou sem sinal).
+
+### Fotos das câmeras
+
+As fotos em `public/cameras/` são **fotos reais de exemplo**, tiradas do Wikimedia Commons com licença livre
+(CC0, CC BY, CC BY-SA ou domínio público). Não foram tiradas nas comunidades. O crédito (autor, licença e link)
+aparece embaixo de cada foto e está em `creditosFotos`, em `src/data/mock.js`. No sistema real, cada quadro
+mostra a última foto enviada pela câmera da horta.
 
 ## Princípios de design
 
@@ -85,9 +93,10 @@ src/
   lib/guardar.js             guardar no aparelho (localStorage) e vibrar
   components/                Topo, BotaoAudio, CaixaDagua, CartaoFalante
   pages/                     Inicio, Horta, Aprender, Vender, Parceiro
-  pages/parceiro/            EscolherOng, Comunidades, Comunidade, GraficoNivel, QuadroCamera, situacao.js
+  pages/parceiro/            Comunidades, Comunidade, GraficoNivel, QuadroCamera, situacao.js
 public/
   sw.js, manifest.webmanifest, icone.svg
+  cameras/                   fotos de exemplo das câmeras (licença livre, ver créditos)
 ```
 
 ## Onde entra a API Java
@@ -104,11 +113,11 @@ Tudo o que o app mostra vem de `src/data/mock.js`. Para ligar na API, troque cad
 | `cursos`                           | Conteúdo das aulas                                                            |
 | `precos`                           | Preço mínimo calculado com o custo da família e o preço local                 |
 | `compradores`                      | Compradores ligados à comunidade                                              |
-| `ongs`                             | Login da ONG e comunidades que ela acompanha                                  |
-| `comunidadesOng`                   | Leituras da caixa, bomba e testes da água; fotos e diagnóstico das câmeras    |
+| `ong`                              | ONG do login (a API só devolve as comunidades dela)                           |
+| `comunidadesOng`, `creditosFotos`  | Leituras da caixa, bomba e testes da água; fotos e diagnóstico das câmeras    |
 
 Também são simulados: a análise da foto tirada pela família (`respostaFoto` em `src/pages/Horta.jsx`),
-as imagens das câmeras (desenhadas em `QuadroCamera.jsx`) e as ações da ONG (enviar orientação,
+as fotos das câmeras (fotos de exemplo do Wikimedia Commons) e as ações da ONG (enviar orientação,
 marcar visita), que hoje só mudam a tela.
 
 ## Licença

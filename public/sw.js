@@ -4,7 +4,7 @@
  * - Páginas: tenta a rede primeiro; sem rede, usa a cópia guardada.
  * - Arquivos (JS, CSS, fontes): usa a cópia guardada e atualiza por trás.
  */
-const CACHE = 'gota-a-gota-v1'
+const CACHE = 'gota-a-gota-v2'
 const BASICO = ['./', './index.html', './manifest.webmanifest', './icone.svg']
 
 self.addEventListener('install', (e) => {

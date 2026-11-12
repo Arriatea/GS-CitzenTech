@@ -64,8 +64,10 @@ export const canteiros = [
   { id: 'tomate', figura: '🍅', nome: 'Tomate', destino: 'venda', estado: 'cuidado', aula: 'pulgao', aviso: 'A câmera viu bichinhos.' },
   { id: 'cebolinha', figura: '🌿', nome: 'Cebolinha', destino: 'venda', estado: 'crescendo' },
   { id: 'melancia', figura: '🍉', nome: 'Melancia', destino: 'venda', estado: 'crescendo' },
-  { id: 'coentro', figura: '🍃', nome: 'Coentro', destino: 'comunidade', estado: 'crescendo' },
-  { id: 'couve', figura: '🥗', nome: 'Couve', destino: 'comunidade', estado: 'colher' },
+  // Horta da comunidade: comida que sustenta as famílias, não só tempero.
+  { id: 'milho', figura: '🌽', nome: 'Milho', destino: 'comunidade', estado: 'crescendo' },
+  { id: 'feijao', figura: '🫘', nome: 'Feijão', destino: 'comunidade', estado: 'colher' },
+  { id: 'batata-doce', figura: '🍠', nome: 'Batata-doce', destino: 'comunidade', estado: 'crescendo' },
 ]
 
 /* Aulas. Cada passo é uma tela. */
@@ -161,6 +163,7 @@ export const ong = {
  * camera.imagem: arquivo em public/cameras/ (fotos reais com licença livre, ver creditosFotos).
  *               No sistema real, é a última foto que a câmera mandou.
  * camera.estado: 'saudavel' | 'alerta' | 'sem-sinal'
+ * camera.resumo: o problema em poucas palavras, para a lista de pendências
  * camera.marca: área da foto onde a IA viu o problema (em % da imagem), para desenhar o quadrado
  * caixa.historico: nível em % nos últimos 7 dias (ver diasHistorico)
  */
@@ -187,6 +190,7 @@ export const comunidadesOng = [
         imagem: 'angelica-tomate',
         estado: 'alerta',
         diagnostico: 'Pintinhas claras nas folhas. Bichinhos sugando a folha (ácaro ou tripes).',
+        resumo: 'ácaro ou tripes',
         confianca: 82,
         aula: 'pulgao',
         marca: { x: 56, y: 12, l: 36, a: 44 },
@@ -217,6 +221,7 @@ export const comunidadesOng = [
         imagem: 'carnauba-pimentao',
         estado: 'alerta',
         diagnostico: 'Folhas manchadas e enrugadas. Pode ser vira-cabeça (vírus); separar os pés doentes.',
+        resumo: 'possível vira-cabeça',
         confianca: 74,
         marca: { x: 6, y: 16, l: 30, a: 34 },
         ultimaFoto: 'há 20 min',
@@ -274,6 +279,7 @@ export const comunidadesOng = [
         imagem: 'mandacaru-couve',
         estado: 'alerta',
         diagnostico: 'Pulgão embaixo das folhas.',
+        resumo: 'pulgão',
         confianca: 91,
         aula: 'pulgao',
         marca: { x: 42, y: 28, l: 34, a: 42 },
