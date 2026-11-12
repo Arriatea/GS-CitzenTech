@@ -138,27 +138,30 @@ export const compradores = [
   { id: 'feira', figura: '⛺', nome: 'Feira de Assú', quer: 'de tudo', quando: 'Sábado' },
 ]
 
-/* ---------- Área das ONGs que acompanham as comunidades ---------- */
+/* ---------- Área da ONG que acompanha as comunidades ---------- */
 
 /*
- * Cada ONG entra e vê só as comunidades que ela acompanha.
- * Os nomes de ONG e as comunidades marcadas "(exemplo)" são fictícios.
- * Só a Comunidade Angélica é real; os dados dela aqui também são simulados.
+ * Este app atende UMA ONG. Quem entra na área da ONG vê só as comunidades dela;
+ * não existe tela para escolher ou trocar de ONG. Outra ONG teria o próprio acesso
+ * (no sistema real, o login define a ONG e a API só devolve as comunidades dela).
  *
- * Os dados da Angélica são os mesmos que a família vê no app (água boa, caixa cheia,
- * bichinhos no tomate), para mostrar que as duas pontas olham a mesma informação.
+ * O nome da ONG e as comunidades marcadas "(exemplo)" são fictícios.
+ * Só a Comunidade Angélica é real; os dados dela aqui também são simulados, e são os mesmos
+ * que a família vê no app (água boa, caixa cheia, bichinhos no tomate).
  */
-export const ongs = [
-  { id: 'rede-sertao', nome: 'Rede Água no Sertão (exemplo)', comunidades: ['angelica', 'carnauba', 'umbuzeiro'] },
-  { id: 'instituto-mandacaru', nome: 'Instituto Mandacaru (exemplo)', comunidades: ['juazeiro', 'mandacaru'] },
-]
+export const ong = {
+  id: 'rede-sertao',
+  nome: 'Rede Água no Sertão (exemplo)',
+}
 
 /*
  * bomba.estado: 'ligada' (tem sol e está bombeando) | 'sem-sol' (parada por falta de sol, é normal)
  *               | 'falha' (tem sol, mas não bombeia: precisa de visita)
  * bomba.fonteHorta: de onde a horta está tirando água agora: 'poco' | 'caixa'
+ * camera.imagem: arquivo em public/cameras/ (fotos reais com licença livre, ver creditosFotos).
+ *               No sistema real, é a última foto que a câmera mandou.
  * camera.estado: 'saudavel' | 'alerta' | 'sem-sinal'
- * camera.marca: área da imagem onde a IA viu o problema (em % da imagem), para desenhar o quadrado
+ * camera.marca: área da foto onde a IA viu o problema (em % da imagem), para desenhar o quadrado
  * caixa.historico: nível em % nos últimos 7 dias (ver diasHistorico)
  */
 export const comunidadesOng = [
@@ -177,20 +180,20 @@ export const comunidadesOng = [
       { quando: '5 de nov.', texto: 'Teste da água: boa para beber.' },
     ],
     cameras: [
-      { id: 'c1', canteiro: 'Alface', figura: '🥬', estado: 'saudavel', diagnostico: 'Folhas verdes, no ponto de colher.', foto: 'há 12 min' },
+      { id: 'c1', canteiro: 'Alface', imagem: 'angelica-alface', estado: 'saudavel', diagnostico: 'Folhas verdes, no ponto de colher.', ultimaFoto: 'há 12 min' },
       {
         id: 'c2',
         canteiro: 'Tomate',
-        figura: '🍅',
+        imagem: 'angelica-tomate',
         estado: 'alerta',
-        diagnostico: 'Possível pulgão embaixo das folhas.',
+        diagnostico: 'Pintinhas claras nas folhas. Bichinhos sugando a folha (ácaro ou tripes).',
         confianca: 82,
         aula: 'pulgao',
-        marca: { x: 50, y: 22, l: 36, a: 52 },
-        foto: 'há 12 min',
+        marca: { x: 56, y: 12, l: 36, a: 44 },
+        ultimaFoto: 'há 12 min',
       },
-      { id: 'c3', canteiro: 'Cebolinha e melancia', figura: '🍉', estado: 'saudavel', diagnostico: 'Crescendo bem.', foto: 'há 12 min' },
-      { id: 'c4', canteiro: 'Horta da comunidade', figura: '🥗', estado: 'saudavel', diagnostico: 'Couve no ponto, coentro crescendo.', foto: 'há 13 min' },
+      { id: 'c3', canteiro: 'Melancia', imagem: 'angelica-melancia', estado: 'saudavel', diagnostico: 'Crescendo bem.', ultimaFoto: 'há 12 min' },
+      { id: 'c4', canteiro: 'Horta da comunidade', imagem: 'angelica-horta', estado: 'saudavel', diagnostico: 'Canteiros cheios, sem problemas.', ultimaFoto: 'há 13 min' },
     ],
   },
   {
@@ -207,19 +210,18 @@ export const comunidadesOng = [
       { quando: 'Há 3 dias', texto: 'A caixa começou a baixar todo dia.' },
     ],
     cameras: [
-      { id: 'c1', canteiro: 'Alface', figura: '🥬', estado: 'saudavel', diagnostico: 'Sem problemas.', foto: 'há 20 min' },
+      { id: 'c1', canteiro: 'Couve', imagem: 'carnauba-couve', estado: 'saudavel', diagnostico: 'Sem problemas.', ultimaFoto: 'há 20 min' },
       {
         id: 'c2',
         canteiro: 'Pimentão',
-        figura: '🫑',
+        imagem: 'carnauba-pimentao',
         estado: 'alerta',
-        diagnostico: 'Folhas murchas por falta de água.',
+        diagnostico: 'Folhas manchadas e enrugadas. Pode ser vira-cabeça (vírus); separar os pés doentes.',
         confianca: 74,
-        aula: 'plantar-alface',
-        marca: { x: 14, y: 26, l: 40, a: 52 },
-        foto: 'há 20 min',
+        marca: { x: 6, y: 16, l: 30, a: 34 },
+        ultimaFoto: 'há 20 min',
       },
-      { id: 'c3', canteiro: 'Horta da comunidade', figura: '🌿', estado: 'sem-sinal', diagnostico: 'Câmera sem sinal desde 9h40.', foto: 'há 3 h' },
+      { id: 'c3', canteiro: 'Horta da comunidade', estado: 'sem-sinal', diagnostico: 'Câmera sem sinal desde 9h40.', ultimaFoto: 'há 3 h' },
     ],
   },
   {
@@ -236,8 +238,8 @@ export const comunidadesOng = [
       { quando: '9 de nov.', texto: 'Teste da água: turbidez alta.' },
     ],
     cameras: [
-      { id: 'c1', canteiro: 'Coentro', figura: '🍃', estado: 'saudavel', diagnostico: 'Crescendo bem.', foto: 'há 15 min' },
-      { id: 'c2', canteiro: 'Cebolinha', figura: '🌿', estado: 'saudavel', diagnostico: 'Crescendo bem.', foto: 'há 15 min' },
+      { id: 'c1', canteiro: 'Coentro', imagem: 'umbuzeiro-coentro', estado: 'saudavel', diagnostico: 'Crescendo bem.', ultimaFoto: 'há 15 min' },
+      { id: 'c2', canteiro: 'Cebolinha', imagem: 'umbuzeiro-cebolinha', estado: 'saudavel', diagnostico: 'Crescendo bem.', ultimaFoto: 'há 15 min' },
     ],
   },
   {
@@ -251,8 +253,8 @@ export const comunidadesOng = [
     qualidade: { boa: true, ultimoTeste: '7 de nov.', detalhe: 'Sem problemas no último teste.' },
     eventos: [{ quando: 'Hoje, 8h', texto: 'A bomba está enchendo a caixa.' }],
     cameras: [
-      { id: 'c1', canteiro: 'Tomate', figura: '🍅', estado: 'saudavel', diagnostico: 'Sem problemas.', foto: 'há 4 min' },
-      { id: 'c2', canteiro: 'Alface', figura: '🥬', estado: 'saudavel', diagnostico: 'Sem problemas.', foto: 'há 4 min' },
+      { id: 'c1', canteiro: 'Tomate', imagem: 'juazeiro-tomate', estado: 'saudavel', diagnostico: 'Sem problemas.', ultimaFoto: 'há 4 min' },
+      { id: 'c2', canteiro: 'Cebolinha', imagem: 'juazeiro-cebolinha', estado: 'saudavel', diagnostico: 'Sem problemas.', ultimaFoto: 'há 4 min' },
     ],
   },
   {
@@ -268,18 +270,38 @@ export const comunidadesOng = [
     cameras: [
       {
         id: 'c1',
-        canteiro: 'Melancia',
-        figura: '🍉',
+        canteiro: 'Couve',
+        imagem: 'mandacaru-couve',
         estado: 'alerta',
-        diagnostico: 'Manchas nas folhas. Pode ser fungo.',
-        confianca: 61,
-        marca: { x: 28, y: 30, l: 40, a: 46 },
-        foto: 'há 40 min',
+        diagnostico: 'Pulgão embaixo das folhas.',
+        confianca: 91,
+        aula: 'pulgao',
+        marca: { x: 42, y: 28, l: 34, a: 42 },
+        ultimaFoto: 'há 40 min',
       },
-      { id: 'c2', canteiro: 'Couve', figura: '🥗', estado: 'saudavel', diagnostico: 'Sem problemas.', foto: 'há 40 min' },
+      { id: 'c2', canteiro: 'Coentro', imagem: 'mandacaru-coentro', estado: 'saudavel', diagnostico: 'Sem problemas.', ultimaFoto: 'há 40 min' },
     ],
   },
 ]
+
+/*
+ * Créditos das fotos das câmeras (Wikimedia Commons, licenças livres).
+ * São fotos reais usadas como exemplo; não foram tiradas nas comunidades.
+ */
+export const creditosFotos = {
+  'angelica-alface': { autor: 'Nick Smith', licenca: 'CC BY-SA 2.0', pagina: 'https://commons.wikimedia.org/wiki/File:Rows_of_baby_lettuce_-_geograph.org.uk_-_1003644.jpg' },
+  'angelica-tomate': { autor: 'Natalka Ukraine (baby-bear.org)', licenca: 'CC BY 4.0', pagina: 'https://commons.wikimedia.org/wiki/File:Solanum_lycopersicum_leaves_with_spider_mite_or_thrips_damage_in_Dnipro_by_baby-bear.org.jpg' },
+  'angelica-melancia': { autor: '-JvL- from Netherlands', licenca: 'CC BY 2.0', pagina: 'https://commons.wikimedia.org/wiki/File:Watermelon_plant_(32714113924).jpg' },
+  'angelica-horta': { autor: 'Joe Mabel', licenca: 'CC BY-SA 3.0', pagina: 'https://commons.wikimedia.org/wiki/File:Picardo_Oct_03.jpg' },
+  'carnauba-couve': { autor: 'cultivar413', licenca: 'CC BY 2.0', pagina: 'https://commons.wikimedia.org/wiki/File:190908_073_Chicago_Botanic_Gdn_-_Heritage_Garden,_Europe_Bed,_Brassica_oleracea_Acephala_group_Red_Russian-type_Kale,_Lavandula_x_allardii_%27Meerlo%27_Variegated_Lavender_(48860964763).jpg' },
+  'carnauba-pimentao': { autor: 'Carlos Gonzalez', licenca: 'CC BY-SA 3.0', pagina: 'https://commons.wikimedia.org/wiki/File:Pepper_infected_with_tomato_spotted_wilt_virus.jpg' },
+  'umbuzeiro-coentro': { autor: 'Judgefloro', licenca: 'CC0', pagina: 'https://commons.wikimedia.org/wiki/File:8855Plants_Herbs_of_the_Philippines_17.jpg' },
+  'umbuzeiro-cebolinha': { autor: 'Salicyna', licenca: 'CC BY-SA 4.0', pagina: 'https://commons.wikimedia.org/wiki/File:Allium_fistulosum_2020-09-22_2857.jpg' },
+  'juazeiro-tomate': { autor: "Mary O'Neill (NPS)", licenca: 'Domínio público', pagina: 'https://commons.wikimedia.org/wiki/File:Vegetable_garden_at_Eisenhower_National_Historic_Site,_tomato_plants._(bd342150-8494-492f-b030-0e9c7e4aba52).jpg' },
+  'juazeiro-cebolinha': { autor: 'Kurt Stüber', licenca: 'CC BY-SA 3.0', pagina: 'https://commons.wikimedia.org/wiki/File:Allium_fistulosum_bulbifera0.jpg' },
+  'mandacaru-couve': { autor: 'Sanjay Acharya', licenca: 'CC BY-SA 4.0', pagina: 'https://commons.wikimedia.org/wiki/File:Cabbage_Aphids_on_Kale_Leaf.jpg' },
+  'mandacaru-coentro': { autor: 'Judgefloro', licenca: 'CC0', pagina: 'https://commons.wikimedia.org/wiki/File:8855Plants_Herbs_of_the_Philippines_18.jpg' },
+}
 
 /* Rótulos do gráfico de nível da caixa (do mais antigo para hoje). */
 export const diasHistorico = ['qua', 'qui', 'sex', 'sáb', 'dom', 'seg', 'hoje']

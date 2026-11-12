@@ -217,7 +217,7 @@ export default function Comunidade({ c, voltar }) {
           Horta pelas câmeras
         </h2>
         <p className="mt-1 text-lg text-texto/80">
-          A IA olha a última foto de cada câmera e aponta o que pode estar errado. Imagens ilustrativas.
+          A IA olha a última foto de cada câmera e aponta o que pode estar errado. Fotos de exemplo, com crédito embaixo de cada uma.
         </p>
         <ul className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {c.cameras.map((cam, i) => (

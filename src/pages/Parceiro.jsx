@@ -1,37 +1,16 @@
-import { useState } from 'react'
-import { PiArrowLeftBold, PiArrowsLeftRightBold, PiBuildingsFill } from 'react-icons/pi'
-import { comunidadesOng, ongs } from '../data/mock.js'
-import { gravar, ler } from '../lib/guardar.js'
+import { PiArrowLeftBold, PiBuildingsFill } from 'react-icons/pi'
+import { comunidadesOng, ong } from '../data/mock.js'
 import Comunidade from './parceiro/Comunidade.jsx'
 import Comunidades from './parceiro/Comunidades.jsx'
-import EscolherOng from './parceiro/EscolherOng.jsx'
 
 /*
- * Área das ONGs que acompanham as comunidades (público técnico, pode ter números).
- * #parceiro          → escolher a ONG (se ainda não escolheu) ou ver as comunidades dela
- * #parceiro/angelica → detalhe de uma comunidade (só se for da ONG escolhida)
+ * Área da ONG que acompanha as comunidades (público técnico, pode ter números).
+ * O app atende uma ONG só: não há escolha nem troca de ONG.
+ * #parceiro          → comunidades da ONG
+ * #parceiro/angelica → detalhe de uma comunidade (se não for da ONG, volta para a lista)
  */
 export default function Parceiro({ ir, detalhe }) {
-  const [ongId, setOngId] = useState(() => ler('ong', null))
-  const ong = ongs.find((o) => o.id === ongId)
-
-  function escolher(id) {
-    gravar('ong', id)
-    setOngId(id)
-    window.scrollTo(0, 0)
-  }
-
-  function trocarOng() {
-    gravar('ong', null)
-    setOngId(null)
-    ir('parceiro')
-  }
-
-  if (!ong) return <EscolherOng ir={ir} escolher={escolher} />
-
-  // Cada ONG só enxerga as comunidades dela.
-  const comunidades = comunidadesOng.filter((c) => ong.comunidades.includes(c.id))
-  const aberta = comunidades.find((c) => c.id === detalhe)
+  const aberta = comunidadesOng.find((c) => c.id === detalhe)
 
   return (
     <div className="mx-auto max-w-5xl px-4 pt-4 pb-36">
@@ -47,27 +26,17 @@ export default function Parceiro({ ir, detalhe }) {
           <PiArrowLeftBold aria-hidden="true" className="size-5" />
           App da comunidade
         </a>
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center gap-2 text-base font-bold">
-            <PiBuildingsFill aria-hidden="true" className="size-6 text-azul" />
-            {ong.nome}
-          </span>
-          <button
-            type="button"
-            onClick={trocarOng}
-            className="inline-flex min-h-12 items-center gap-2 rounded-xl border-3 border-nuvem bg-white px-3 text-base font-bold"
-          >
-            <PiArrowsLeftRightBold aria-hidden="true" className="size-5" />
-            Trocar de ONG
-          </button>
-        </div>
+        <span className="inline-flex items-center gap-2 text-base font-bold">
+          <PiBuildingsFill aria-hidden="true" className="size-6 text-azul" />
+          {ong.nome}
+        </span>
       </div>
 
       <div className="mt-6">
         {aberta ? (
           <Comunidade c={aberta} voltar={() => ir('parceiro')} />
         ) : (
-          <Comunidades ong={ong} comunidades={comunidades} abrir={(id) => ir('parceiro', id)} />
+          <Comunidades ong={ong} comunidades={comunidadesOng} abrir={(id) => ir('parceiro', id)} />
         )}
       </div>
     </div>

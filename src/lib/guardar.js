@@ -1,5 +1,5 @@
 /*
- * Guarda pequenas coisas no próprio aparelho (tarefas feitas hoje, aulas terminadas, ONG escolhida).
+ * Guarda pequenas coisas no próprio aparelho (tarefas feitas hoje, aulas terminadas).
  * Se o navegador não deixar guardar, o app funciona do mesmo jeito, só não lembra.
  */
 
