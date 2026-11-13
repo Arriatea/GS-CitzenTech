@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.rotas import dados, precos
+from app.rotas import agua as rota_agua, dados, precos
 
 app = FastAPI(title="Gota a Gota")
 
@@ -14,6 +14,7 @@ app.add_middleware(
 
 app.include_router(dados.roteador)
 app.include_router(precos.roteador)
+app.include_router(rota_agua.roteador)
 
 
 @app.get("/saude")
