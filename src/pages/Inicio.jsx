@@ -2,9 +2,12 @@ import { useState } from 'react'
 import { PiCheckBold, PiQuestionBold } from 'react-icons/pi'
 import CaixaDagua from '../components/CaixaDagua.jsx'
 import CartaoFalante from '../components/CartaoFalante.jsx'
-import { agua, tarefas, usuaria } from '../data/mock.js'
+import Carregando from '../components/Carregando.jsx'
+import { usuaria } from '../data/mock.js'
+import { buscarAgua, buscarTarefas } from '../lib/api.js'
 import { useAudioDescricao, useDescricao } from '../lib/AudioDescricao.jsx'
 import { gravar, hoje, ler, vibrar } from '../lib/guardar.js'
+import { useApi } from '../lib/useApi.js'
 
 const textoCaixa = {
   cheia: 'A caixa está cheia',
@@ -33,7 +36,7 @@ function Marca() {
 }
 
 /* O progresso das tarefas vale só para o dia de hoje. */
-function lerProgresso() {
+function lerProgresso(tarefas) {
   const salvo = ler('tarefas', null)
   return salvo && salvo.dia === hoje() ? Math.min(salvo.indice, tarefas.length) : 0
 }
@@ -42,7 +45,7 @@ function lerProgresso() {
  * As tarefas do dia em fila. A feita ganha ✓ e pode ser tocada para voltar nela
  * (se a pessoa apertou "Já fiz" sem querer).
  */
-function FilaDeTarefas({ atual, voltarPara }) {
+function FilaDeTarefas({ tarefas, atual, voltarPara }) {
   return (
     <ol className="flex gap-2">
       {tarefas.map((t, i) => {
@@ -95,9 +98,18 @@ const secoes = [
   { destino: 'vender', figura: '💰', rotulo: 'Vender', classe: 'bg-amarelo text-texto' },
 ]
 
+const ATUALIZA_AGUA_MS = 5000
+
 export default function Inicio({ ir }) {
+  const { dados: agua } = useApi(buscarAgua, ATUALIZA_AGUA_MS)
+  const { dados: tarefas } = useApi(buscarTarefas)
+  if (!agua || !tarefas) return <Carregando />
+  return <InicioConteudo ir={ir} agua={agua} tarefas={tarefas} />
+}
+
+function InicioConteudo({ ir, agua, tarefas }) {
   const { dizer } = useAudioDescricao()
-  const [indice, setIndiceEstado] = useState(lerProgresso)
+  const [indice, setIndiceEstado] = useState(() => lerProgresso(tarefas))
 
   function setIndice(novo) {
     setIndiceEstado(novo)
@@ -179,7 +191,7 @@ export default function Inicio({ ir }) {
         <section aria-label="Tarefa de hoje" className="cartao mt-6 p-5">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-3xl font-bold whitespace-nowrap">Para hoje</h2>
-            <FilaDeTarefas atual={indice} voltarPara={voltarPara} />
+            <FilaDeTarefas tarefas={tarefas} atual={indice} voltarPara={voltarPara} />
           </div>
 
           {tudoFeito ? (
