@@ -2,15 +2,24 @@ import { useRef, useState } from 'react'
 import { PiCalendarBlankFill, PiCheckCircleFill, PiMinusBold, PiPlusBold } from 'react-icons/pi'
 import CartaoFalante from '../components/CartaoFalante.jsx'
 import Topo from '../components/Topo.jsx'
-import { compradores, precos } from '../data/mock.js'
+import Carregando from '../components/Carregando.jsx'
+import { buscarCompradores, buscarPrecos } from '../lib/api.js'
 import { useAudioDescricao, useDescricao } from '../lib/AudioDescricao.jsx'
 import { precoFalado } from '../lib/voz.js'
 import { vibrar } from '../lib/guardar.js'
+import { useApi } from '../lib/useApi.js'
 
 const formatarPreco = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 const maiuscula = (texto) => texto.charAt(0).toUpperCase() + texto.slice(1)
 
 export default function Vender({ ir }) {
+  const { dados: precos } = useApi(buscarPrecos)
+  const { dados: compradores } = useApi(buscarCompradores)
+  if (!precos || !compradores) return <Carregando />
+  return <VenderConteudo ir={ir} precos={precos} compradores={compradores} />
+}
+
+function VenderConteudo({ ir, precos, compradores }) {
   const { dizer } = useAudioDescricao()
   const [escolhido, setEscolhido] = useState(precos[0].id)
   const [quantos, setQuantos] = useState(1)
