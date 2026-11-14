@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { PiCameraFill, PiCheckCircleFill, PiFirstAidKitFill, PiPlantFill, PiVideoCameraFill, PiWarningFill } from 'react-icons/pi'
 import CartaoFalante from '../components/CartaoFalante.jsx'
 import Topo from '../components/Topo.jsx'
-import { canteiros } from '../data/mock.js'
+import Carregando from '../components/Carregando.jsx'
+import { buscarCanteiros } from '../lib/api.js'
 import { useAudioDescricao, useDescricao } from '../lib/AudioDescricao.jsx'
+import { useApi } from '../lib/useApi.js'
 
 /* Selo de estado: sempre cor e palavra juntas. */
 const estados = {
@@ -73,6 +75,12 @@ const ordem = { cuidado: 0, colher: 1, crescendo: 2 }
 const porUrgencia = (a, b) => ordem[a.estado] - ordem[b.estado]
 
 export default function Horta({ ir }) {
+  const { dados: canteiros } = useApi(buscarCanteiros)
+  if (!canteiros) return <Carregando />
+  return <HortaConteudo ir={ir} canteiros={canteiros} />
+}
+
+function HortaConteudo({ ir, canteiros }) {
   const { dizer } = useAudioDescricao()
   const [foto, setFoto] = useState(null)
   const [situacao, setSituacao] = useState('nada') // 'nada' | 'olhando' | 'pronto'
