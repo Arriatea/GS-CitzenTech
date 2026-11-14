@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PiCheckBold, PiQuestionBold } from 'react-icons/pi'
 import CaixaDagua from '../components/CaixaDagua.jsx'
 import CartaoFalante from '../components/CartaoFalante.jsx'
@@ -108,7 +108,8 @@ export default function Inicio({ ir }) {
 }
 
 function InicioConteudo({ ir, agua, tarefas }) {
-  const { dizer } = useAudioDescricao()
+  const { dizer, ligado } = useAudioDescricao()
+  const aguaAnterior = useRef(agua)
   const [indice, setIndiceEstado] = useState(() => lerProgresso(tarefas))
 
   function setIndice(novo) {
@@ -121,6 +122,18 @@ function InicioConteudo({ ir, agua, tarefas }) {
   const ola = `${saudacao()}, ${usuaria.nome}!`
   const dias = agua.diasParaBeber === 1 ? '1 dia' : `${agua.diasParaBeber} dias`
   const temSol = agua.fonte === 'poco'
+
+  useEffect(() => {
+    const antes = aguaAnterior.current
+    aguaAnterior.current = agua
+    if (!ligado) return
+    const avisos = []
+    if (antes.caixa !== agua.caixa) avisos.push(`Atenção: ${textoCaixa[agua.caixa].toLowerCase()}.`)
+    if (antes.fonte !== agua.fonte) {
+      avisos.push(agua.fonte === 'poco' ? 'Agora tem sol: a bomba ligou.' : 'Agora não tem sol: a horta usa a água da caixa.')
+    }
+    if (avisos.length) dizer(avisos.join(' '))
+  }, [agua, ligado, dizer])
 
   const falaAgua = [
     agua.boa ? 'Água boa.' : 'Cuidado: a água não está boa para beber.',
