@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { PiArrowLeftBold, PiArrowRightBold, PiCheckBold, PiCheckCircleFill } from 'react-icons/pi'
 import Topo, { coresSecao } from '../components/Topo.jsx'
-import { cursos } from '../data/mock.js'
+import Carregando from '../components/Carregando.jsx'
+import { buscarCursos } from '../lib/api.js'
 import { useDescricao } from '../lib/AudioDescricao.jsx'
 import { gravar, ler, vibrar } from '../lib/guardar.js'
+import { useApi } from '../lib/useApi.js'
 
 const corPreenchida = {
   laranja: 'bg-laranja',
@@ -13,7 +15,7 @@ const corPreenchida = {
   vermelho: 'bg-vermelho',
 }
 
-function Lista({ ir, feitas }) {
+function Lista({ ir, feitas, cursos }) {
   useDescricao(
     `Você está em Aprender. No alto tem o botão Início. Tem ${cursos.length} aulas: ${cursos
       .map((c) => `${c.titulo}, ${c.passos.length} passos${feitas.includes(c.id) ? ', já feita' : ''}`)
@@ -174,6 +176,12 @@ function Aula({ curso, voltar, aoTerminar }) {
 
 /* A aula aberta vem da âncora: #aprender/pulgao. Sem detalhe, mostra a lista. */
 export default function Aprender({ ir, detalhe }) {
+  const { dados: cursos } = useApi(buscarCursos)
+  if (!cursos) return <Carregando />
+  return <AprenderConteudo ir={ir} detalhe={detalhe} cursos={cursos} />
+}
+
+function AprenderConteudo({ ir, detalhe, cursos }) {
   const [feitas, setFeitas] = useState(() => ler('aulas-feitas', []))
   const curso = cursos.find((c) => c.id === detalhe)
 
@@ -185,5 +193,5 @@ export default function Aprender({ ir, detalhe }) {
   }
 
   if (curso) return <Aula curso={curso} voltar={() => ir('aprender')} aoTerminar={marcarFeita} />
-  return <Lista ir={ir} feitas={feitas} />
+  return <Lista ir={ir} feitas={feitas} cursos={cursos} />
 }
