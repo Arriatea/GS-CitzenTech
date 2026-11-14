@@ -1,5 +1,8 @@
 import { PiArrowLeftBold, PiBuildingsFill } from 'react-icons/pi'
-import { comunidadesOng, ong } from '../data/mock.js'
+import Carregando from '../components/Carregando.jsx'
+import { ong } from '../data/mock.js'
+import { buscarComunidades, buscarCursos } from '../lib/api.js'
+import { useApi } from '../lib/useApi.js'
 import Comunidade from './parceiro/Comunidade.jsx'
 import Comunidades from './parceiro/Comunidades.jsx'
 
@@ -10,6 +13,13 @@ import Comunidades from './parceiro/Comunidades.jsx'
  * #parceiro/angelica → detalhe de uma comunidade (se não for da ONG, volta para a lista)
  */
 export default function Parceiro({ ir, detalhe }) {
+  const { dados: comunidadesOng } = useApi(buscarComunidades)
+  const { dados: cursos } = useApi(buscarCursos)
+  if (!comunidadesOng || !cursos) return <Carregando />
+  return <ParceiroConteudo ir={ir} detalhe={detalhe} comunidadesOng={comunidadesOng} cursos={cursos} />
+}
+
+function ParceiroConteudo({ ir, detalhe, comunidadesOng, cursos }) {
   const aberta = comunidadesOng.find((c) => c.id === detalhe)
 
   return (
@@ -34,7 +44,7 @@ export default function Parceiro({ ir, detalhe }) {
 
       <div className="mt-6">
         {aberta ? (
-          <Comunidade c={aberta} voltar={() => ir('parceiro')} />
+          <Comunidade c={aberta} cursos={cursos} voltar={() => ir('parceiro')} />
         ) : (
           <Comunidades ong={ong} comunidades={comunidadesOng} abrir={(id) => ir('parceiro', id)} />
         )}

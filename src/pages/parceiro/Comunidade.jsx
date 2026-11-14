@@ -8,7 +8,6 @@ import {
   PiWrenchFill,
 } from 'react-icons/pi'
 import CaixaDagua from '../../components/CaixaDagua.jsx'
-import { cursos } from '../../data/mock.js'
 import { useAudioDescricao, useDescricao } from '../../lib/AudioDescricao.jsx'
 import GraficoNivel from './GraficoNivel.jsx'
 import Indicadores, { Ponto } from './Indicadores.jsx'
@@ -40,7 +39,7 @@ function Detalhe({ rotulo, valor, detalhe, tom }) {
   )
 }
 
-function Camera({ cam, numeroCam, feito, agir }) {
+function Camera({ cam, cursos, numeroCam, feito, agir }) {
   const estado = camera[cam.estado]
   const aula = cursos.find((c) => c.id === cam.aula)
 
@@ -92,7 +91,7 @@ function Camera({ cam, numeroCam, feito, agir }) {
   )
 }
 
-export default function Comunidade({ c, voltar }) {
+export default function Comunidade({ c, cursos, voltar }) {
   const { dizer } = useAudioDescricao()
   const [feitos, setFeitos] = useState([])
   const situacao = situacaoDa(c)
@@ -239,7 +238,7 @@ export default function Comunidade({ c, voltar }) {
         </p>
         <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {cameras.map(({ cam, numero: n }) => (
-            <Camera key={cam.id} cam={cam} numeroCam={n} feito={feitos.includes(cam.id)} agir={() => agir(cam)} />
+            <Camera key={cam.id} cam={cam} cursos={cursos} numeroCam={n} feito={feitos.includes(cam.id)} agir={() => agir(cam)} />
           ))}
         </ul>
       </section>
