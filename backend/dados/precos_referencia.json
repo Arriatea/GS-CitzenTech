@@ -1,0 +1,34 @@
+[
+  {
+    "cultura": "alface",
+    "unidade": "cada pé",
+    "preco_atacado": 1.5,
+    "fonte": "Conab/Prohort – Ceasa/RN Natal",
+    "data_consulta": "PREENCHER COM A CONSULTA",
+    "observacao": "PREENCHER COM A CONSULTA: valor de exemplo"
+  },
+  {
+    "cultura": "tomate",
+    "unidade": "o quilo",
+    "preco_atacado": 5.0,
+    "fonte": "Conab/Prohort – Ceasa/RN Natal",
+    "data_consulta": "PREENCHER COM A CONSULTA",
+    "observacao": "PREENCHER COM A CONSULTA: valor de exemplo"
+  },
+  {
+    "cultura": "melancia",
+    "unidade": "cada uma",
+    "preco_atacado": 8.0,
+    "fonte": "Conab/Prohort – Ceasa/RN Natal",
+    "data_consulta": "PREENCHER COM A CONSULTA",
+    "observacao": "PREENCHER COM A CONSULTA: valor de exemplo"
+  },
+  {
+    "cultura": "cebolinha",
+    "unidade": "cada maço",
+    "preco_atacado": 1.2,
+    "fonte": "Conab/Prohort – Ceasa/RN Natal",
+    "data_consulta": "PREENCHER COM A CONSULTA",
+    "observacao": "PREENCHER COM A CONSULTA: valor de exemplo"
+  }
+]
