@@ -17,3 +17,8 @@ class NovaColheita(BaseModel):
     cultura: str = Field(min_length=1)
     quantidade: float = Field(gt=0)
     unidade: str = Field(min_length=1)
+
+
+class Conversa(BaseModel):
+    sessao: str = Field(min_length=1, max_length=100)
+    mensagem: str = Field(min_length=1, max_length=1000)

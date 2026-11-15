@@ -13,6 +13,7 @@ MENSAGENS = {
     "int_type": "deve ser um número inteiro",
     "string_type": "deve ser um texto",
     "string_too_short": "não pode ser vazio",
+    "string_too_long": "deve ter no máximo {max_length} caracteres",
     "greater_than": "deve ser maior que {gt}",
     "greater_than_equal": "deve ser maior ou igual a {ge}",
     "less_than_equal": "deve ser menor ou igual a {le}",

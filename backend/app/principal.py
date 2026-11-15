@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -5,7 +8,9 @@ from starlette.exceptions import HTTPException as ErroHTTP
 
 from app.erros import erro_de_validacao, erro_http
 
-from app.rotas import agua as rota_agua, colheitas, dados, leituras, precos
+from app.rotas import agua as rota_agua, colheitas, conversar, dados, leituras, precos
+
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 app = FastAPI(title="Gota a Gota")
 
@@ -24,6 +29,7 @@ app.include_router(precos.roteador)
 app.include_router(rota_agua.roteador)
 app.include_router(leituras.roteador)
 app.include_router(colheitas.roteador)
+app.include_router(conversar.roteador)
 
 
 @app.get("/saude")
