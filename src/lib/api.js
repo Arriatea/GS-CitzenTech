@@ -32,3 +32,27 @@ export const buscarPrecos = () => buscar('/precos', mock.precos)
 export const buscarCompradores = () => buscar('/compradores', mock.compradores)
 export const buscarImpacto = () => buscar('/impacto', null)
 export const buscarComunidades = () => buscar('/comunidades', mock.comunidadesOng)
+
+const TEMPO_LIMITE_CONVERSA_MS = 30000
+export const RESPOSTA_DE_ERRO = 'Não consegui responder agora, tente de novo.'
+
+export async function conversar(sessao, mensagem) {
+  const controle = new AbortController()
+  const relogio = setTimeout(() => controle.abort(), TEMPO_LIMITE_CONVERSA_MS)
+  try {
+    const resposta = await fetch(`${URL_API}/conversar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessao, mensagem }),
+      signal: controle.signal,
+    })
+    if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`)
+    const { resposta: texto } = await resposta.json()
+    return texto || RESPOSTA_DE_ERRO
+  } catch (erro) {
+    console.warn(`Gotinha indisponível (${erro.message}).`)
+    return RESPOSTA_DE_ERRO
+  } finally {
+    clearTimeout(relogio)
+  }
+}
