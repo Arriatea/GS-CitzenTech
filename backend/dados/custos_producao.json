@@ -1,0 +1,10 @@
+{
+  "simulado": true,
+  "explicacao": "Custo de um ciclo de um canteiro. custo_por_unidade = (sementes + adubo + horas_trabalho × valor_hora) ÷ producao_por_ciclo.",
+  "culturas": [
+    { "cultura": "alface", "unidade": "cada pé", "producao_por_ciclo": 120, "sementes": 15, "adubo": 40, "horas_trabalho": 20, "valor_hora": 7.5 },
+    { "cultura": "tomate", "unidade": "o quilo", "producao_por_ciclo": 150, "sementes": 20, "adubo": 80, "horas_trabalho": 60, "valor_hora": 7.5 },
+    { "cultura": "melancia", "unidade": "cada uma", "producao_por_ciclo": 50, "sementes": 25, "adubo": 60, "horas_trabalho": 40, "valor_hora": 7.5 },
+    { "cultura": "cebolinha", "unidade": "cada maço", "producao_por_ciclo": 100, "sementes": 10, "adubo": 25, "horas_trabalho": 15, "valor_hora": 7.5 }
+  ]
+}
