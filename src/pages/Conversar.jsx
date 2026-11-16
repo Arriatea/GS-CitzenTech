@@ -56,7 +56,9 @@ function Balao({ de, texto }) {
 }
 
 export default function Conversar({ ir }) {
-  const { parar } = useAudioDescricao()
+  const { parar, dizer, ligado } = useAudioDescricao()
+  const ligadoRef = useRef(ligado)
+  const montada = useRef(true)
   const [sessao] = useState(() => {
     const salva = lerDaVisita('sessao-gotinha', null)
     if (salva) return salva
@@ -77,7 +79,17 @@ export default function Conversar({ ir }) {
     fim.current?.scrollIntoView({ block: 'nearest' })
   }, [mensagens, esperando])
 
-  useEffect(() => () => reconhecedor.current?.abort(), [])
+  useEffect(() => {
+    ligadoRef.current = ligado
+  }, [ligado])
+
+  useEffect(() => {
+    montada.current = true
+    return () => {
+      montada.current = false
+      reconhecedor.current?.abort()
+    }
+  }, [])
 
   function enviar(pergunta) {
     const limpa = pergunta.trim()
@@ -86,9 +98,16 @@ export default function Conversar({ ir }) {
     setAviso('')
     setMensagens((atuais) => [...atuais, { de: 'pessoa', texto: limpa }])
     setEsperando(true)
+    if (ligadoRef.current) dizer('A Gotinha está pensando.')
     conversar(sessao, limpa).then((resposta) => {
-      setMensagens((atuais) => [...atuais, { de: 'gotinha', texto: resposta }])
+      const nova = { de: 'gotinha', texto: resposta }
+      if (!montada.current) {
+        gravarNaVisita('conversa-gotinha', [...lerDaVisita('conversa-gotinha', [saudacao]), nova])
+        return
+      }
+      setMensagens((atuais) => [...atuais, nova])
       setEsperando(false)
+      if (ligadoRef.current) dizer(resposta)
     })
   }
 
