@@ -6,12 +6,13 @@ import Horta from './pages/Horta.jsx'
 import Aprender from './pages/Aprender.jsx'
 import Vender from './pages/Vender.jsx'
 import Parceiro from './pages/Parceiro.jsx'
+import Conversar from './pages/Conversar.jsx'
 
 /*
  * Navegação pela âncora da URL, sem biblioteca de rotas.
  * Formato: #tela ou #tela/detalhe (ex.: #aprender/pulgao, #parceiro/angelica).
  */
-const telas = { inicio: Inicio, horta: Horta, aprender: Aprender, vender: Vender, parceiro: Parceiro }
+const telas = { inicio: Inicio, horta: Horta, aprender: Aprender, vender: Vender, parceiro: Parceiro, conversar: Conversar }
 
 function lerAncora() {
   const [tela = '', detalhe = null] = decodeURIComponent(window.location.hash.replace('#', '')).split('/')
