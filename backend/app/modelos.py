@@ -22,3 +22,10 @@ class NovaColheita(BaseModel):
 class Conversa(BaseModel):
     sessao: str = Field(min_length=1, max_length=100)
     mensagem: str = Field(min_length=1, max_length=1000)
+
+
+class PrecoLocal(BaseModel):
+    comprador: str = Field(min_length=1)
+    cultura: str = Field(min_length=1)
+    preco: float = Field(gt=0)
+    unidade: str = Field(min_length=1)

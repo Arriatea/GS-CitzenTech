@@ -1,0 +1,10 @@
+[
+  { "comprador": "Mercadinho São José", "cultura": "alface", "preco": 2.9, "unidade": "cada pé", "simulado": true },
+  { "comprador": "Feira de Assú", "cultura": "alface", "preco": 2.7, "unidade": "cada pé", "simulado": true },
+  { "comprador": "Escola (merenda)", "cultura": "cebolinha", "preco": 2.1, "unidade": "cada maço", "simulado": true },
+  { "comprador": "Feira de Assú", "cultura": "cebolinha", "preco": 2.3, "unidade": "cada maço", "simulado": true },
+  { "comprador": "Mercadinho São José", "cultura": "tomate", "preco": 9.5, "unidade": "o quilo", "simulado": true },
+  { "comprador": "Feira de Assú", "cultura": "tomate", "preco": 8.5, "unidade": "o quilo", "simulado": true },
+  { "comprador": "Mercadinho São José", "cultura": "melancia", "preco": 12.5, "unidade": "cada uma", "simulado": true },
+  { "comprador": "Feira de Assú", "cultura": "melancia", "preco": 11.5, "unidade": "cada uma", "simulado": true }
+]

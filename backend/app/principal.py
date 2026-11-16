@@ -8,7 +8,7 @@ from starlette.exceptions import HTTPException as ErroHTTP
 
 from app.erros import erro_de_validacao, erro_http
 
-from app.rotas import agua as rota_agua, colheitas, conversar, dados, leituras, precos
+from app.rotas import agua as rota_agua, colheitas, conversar, dados, leituras, precos, precos_locais
 
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
@@ -26,6 +26,7 @@ app.add_exception_handler(ErroHTTP, erro_http)
 
 app.include_router(dados.roteador)
 app.include_router(precos.roteador)
+app.include_router(precos_locais.roteador)
 app.include_router(rota_agua.roteador)
 app.include_router(leituras.roteador)
 app.include_router(colheitas.roteador)
