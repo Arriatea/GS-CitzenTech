@@ -96,6 +96,7 @@ const secoes = [
   { destino: 'horta', figura: '🌱', rotulo: 'Minha horta', classe: 'bg-laranja text-white' },
   { destino: 'aprender', figura: '📖', rotulo: 'Aprender', classe: 'bg-azul text-white' },
   { destino: 'vender', figura: '💰', rotulo: 'Vender', classe: 'bg-amarelo text-texto' },
+  { destino: 'conversar', figura: '💬', rotulo: 'Falar com a Gotinha', classe: 'bg-verde text-white' },
 ]
 
 const ATUALIZA_AGUA_MS = 5000
@@ -150,7 +151,7 @@ function InicioConteudo({ ir, agua, tarefas }) {
       }`
 
   useDescricao(
-    `Você está no início. ${ola} ${falaAgua} Toque no cartão verde para ouvir de novo. ${descricaoTarefa} Embaixo tem três botões grandes: Minha horta, laranja. Aprender, azul. E Vender, amarelo.`,
+    `Você está no início. ${ola} ${falaAgua} Toque no cartão verde para ouvir de novo. ${descricaoTarefa} Embaixo tem quatro botões grandes: Minha horta, laranja. Aprender, azul. Vender, amarelo. E Falar com a Gotinha, verde.`,
   )
 
   function jaFiz() {
