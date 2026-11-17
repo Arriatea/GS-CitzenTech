@@ -1,6 +1,18 @@
-# GS-CitzensTech
+# Gota a Gota — GS CitizenTech
 
-## Gota a Gota
+## Ficha da CitizenTech
+
+| Campo                  | Informação                                                                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Nome                   | Gota a Gota                                                                                                  |
+| Cidade / bairro        | Comunidade Angélica, Ipanguaçu (RN). PREENCHER se houver outras comunidades                                  |
+| Cidadão beneficiado    | Famílias de comunidades rurais do semiárido potiguar que receberam um poço (donas de casa, agricultores)     |
+| Problema em uma frase  | PREENCHER                                                                                                    |
+| Como funciona          | Sensores na caixa d'água e na horta mandam leituras para uma API; o app mostra a água, orienta a horta, calcula o preço mínimo de venda e responde por voz com a Gotinha |
+| O que cada parte faz   | Veja [As partes](#as-partes)                                                                                 |
+| Repositório            | https://github.com/Arriatea/GS-CitzenTech                                                                    |
+| Indicador de impacto   | PREENCHER                                                                                                    |
+| ODS                    | PREENCHER                                                                                                    |
 
 Plataforma para comunidades rurais do semiárido do Rio Grande do Norte que receberam um poço
 (inspirada no projeto Leve Poços, Comunidade Angélica, Ipanguaçu/RN). O app cuida do "depois do poço":
@@ -8,30 +20,146 @@ mostra o estado da água, orienta a horta, ensina a plantar e a vender, mostra o
 e conecta as famílias aos compradores. A ONG que acompanha as comunidades vê a caixa d'água,
 a bomba solar, a qualidade da água e a saúde da horta pelas câmeras.
 
-Este repositório tem o **front-end**. Todos os dados ainda são **simulados**.
+## As partes
 
-## Como rodar
+| Pasta                       | Parte                     | O que faz                                                                                       |
+| --------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------- |
+| `src/`, `public/` e raiz    | Front (React + Vite)      | App da comunidade e área da ONG. Busca os dados na API e usa dados simulados se ela cair.       |
+| `backend/`                  | API (FastAPI)             | Guarda o estado da água, recebe as leituras do ESP32, calcula o preço mínimo e conversa com a Gotinha. |
+| `agente/`                   | Gotinha (Google ADK)      | Assistente de voz. Responde sobre água, horta, preços, compradores e aulas usando as rotas da API. |
+| `iot/`                      | ESP32 no Wokwi            | Simula a caixa d'água, a bomba solar, o sol, a umidade da terra e a previsão de chuva.          |
 
-Precisa do Node 20 ou mais novo.
+```
+  [ESP32 / Wokwi] ── POST /leituras ──▶ [backend FastAPI :8000] ◀── GET /agua, /precos ... ── [front React :5173]
+                                              ▲        │                                          │
+                                   ferramentas│        │ POST /conversar ◀────────────────────────┘
+                                   (GET /agua,│        ▼
+                                    /precos...)  [Gotinha, Google ADK]
+```
+
+- O front consulta a água a cada 5 segundos. Quando chega uma leitura nova, a tela Início muda sozinha
+  e a audiodescrição avisa.
+- O front fala com a Gotinha por `POST /conversar`. O backend roda o agente, e as ferramentas dele
+  consultam o próprio backend pelo endereço `GOTA_API_URL`.
+- O sketch do ESP32 monta o JSON de `POST /leituras` e mostra no monitor Serial. Para testar, envie esse
+  JSON para a API (exemplo em [Como rodar tudo](#como-rodar-tudo)).
+
+## Como rodar tudo
+
+Precisa de Node 20 ou mais novo e Python 3.12 ou mais novo. Use três terminais.
+
+**Terminal 1: backend** (http://localhost:8000)
+
+```bash
+cd backend
+python -m venv .venv
+.venv\Scripts\activate            # no Linux/Mac: source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env              # preencha GOOGLE_API_KEY
+uvicorn app.principal:app --reload --port 8000
+```
+
+| Variável (`backend/.env`)    | Para quê                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| `GOOGLE_API_KEY`             | Chave do Google AI Studio usada pela Gotinha dentro do app                |
+| `GOOGLE_GENAI_USE_VERTEXAI`  | `FALSE` para usar a chave do AI Studio                                    |
+| `GOTA_API_URL`               | Endereço deste próprio backend, usado pelas ferramentas da Gotinha        |
+
+Sem a chave, tudo funciona, e a Gotinha responde "Não consegui responder agora, tente de novo."
+
+**Terminal 2: agente sozinho no ADK Web** (http://localhost:8080, opcional, para testar a Gotinha fora do app)
+
+```bash
+cd agente
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+cp gota_agente/.env.exemplo gota_agente/.env   # preencha GOOGLE_API_KEY; GOTA_API_URL=http://localhost:8000
+adk web --port 8080
+python testar_ferramentas.py                   # testa as ferramentas sem chamar a IA
+```
+
+**Terminal 3: front** (http://localhost:5173)
 
 ```bash
 npm install
-npm run dev      # abre em http://localhost:5173
-npm run build    # gera a versão final em dist/
-npm run preview  # serve a pasta dist/ (com o modo sem internet ligado)
+cp .env.example .env              # VITE_API_URL=http://localhost:8000
+npm run dev
+npm run build                     # versão final em dist/
 ```
 
-Stack: React 19, Vite, Tailwind CSS v4 (tokens com `@theme static` em `src/index.css`) e ícones Phosphor (`react-icons/pi`).
-Sem biblioteca de rotas: a navegação usa a âncora da URL (`#tela` ou `#tela/detalhe`).
+| Variável (`.env` da raiz) | Para quê                  |
+| ------------------------- | ------------------------- |
+| `VITE_API_URL`            | Endereço do backend       |
+
+Nenhum `.env` vai para o git. Para simular uma leitura do ESP32 com a caixa pela metade:
+
+```bash
+curl -X POST http://localhost:8000/leituras -H "Content-Type: application/json" \
+  -d '{"nivelCaixa":45,"umidadeSolo":38,"temSol":false,"bomba":false,"valvula":true,"irrigando":true,"chuvaAmanha":true,"semaforo":"amarelo","leituraLuz":3100}'
+```
+
+Testes do backend: `cd backend` e `python -m pytest`.
+
+## Rotas da API
+
+| Rota                                   | O que faz                                                                      |
+| -------------------------------------- | ------------------------------------------------------------------------------ |
+| `GET /saude`                           | Confere se a API está no ar                                                    |
+| `GET /agua`                            | Estado da água no formato do front                                             |
+| `POST /leituras`, `GET /leituras/ultima` | Recebe e mostra a leitura do ESP32; a leitura atualiza a água                |
+| `GET /tarefas`, `/canteiros`, `/cursos`, `/compradores`, `/impacto`, `/comunidades` | Dados das telas                   |
+| `GET /precos`, `GET /precos/{cultura}` | Preço mínimo calculado, com o bloco `como_calculamos`                          |
+| `POST /precos-locais`, `GET /precos-locais?cultura=alface` | Preços informados pelos comerciantes                       |
+| `POST /colheitas`, `GET /colheitas`    | Diário de colheitas (usado pela Gotinha)                                       |
+| `POST /conversar`                      | Conversa com a Gotinha: recebe `{sessao, mensagem}` e devolve `{resposta}`     |
+
+## Dados
+
+Tudo é **simulado**, menos a referência de preço de atacado da **Conab/Prohort – Ceasa/RN Natal**
+(`backend/dados/precos_referencia.json`). Enquanto a consulta não for feita, os valores desse arquivo são
+de exemplo e estão marcados com "PREENCHER COM A CONSULTA".
+
+São simulados: a água e as leituras, as tarefas, os canteiros, as aulas, os compradores, os preços dos
+comerciantes, o custo de produção, as comunidades da ONG (as marcadas "(exemplo)" são fictícias), a análise
+da foto tirada pela família e as ações da ONG. As fotos das câmeras são fotos reais de exemplo, com licença
+livre (veja [Fotos das câmeras](#fotos-das-câmeras)). Os dados ficam em memória: reiniciar o backend volta
+ao estado inicial.
+
+## Fonte dos preços
+
+O preço mínimo de cada cultura junta três referências:
+
+| Referência                     | Arquivo / rota                                 | Origem                                         |
+| ------------------------------ | ---------------------------------------------- | ---------------------------------------------- |
+| Preço de atacado               | `backend/dados/precos_referencia.json`         | Conab/Prohort – Ceasa/RN Natal (consulta manual) |
+| Preço dos comerciantes locais  | `POST /precos-locais` (começa com registros simulados) | Mercadinho, escola, feira                |
+| Custo de produção por unidade  | `backend/dados/custos_producao.json` (simulado) | Sementes, adubo e horas de trabalho por ciclo |
+
+Regra (`backend/app/preco_minimo.py`):
+
+- **Com comerciantes:** o maior valor entre custo por unidade × 1,3, a média dos comerciantes e o atacado da Ceasa.
+- **Sem comerciantes:** o maior valor entre custo por unidade × 1,3 e o atacado da Ceasa × 1,2.
+
+O atacado da Ceasa funciona como **piso**: a família nunca vende abaixo do que o atacado paga.
+A resposta de `GET /precos/{cultura}` mostra a conta no bloco `como_calculamos`. A leitura da referência
+fica na classe `FonteDePrecoReferencia` (`backend/app/fonte_preco.py`), para trocar o JSON por uma API real
+sem mexer no resto.
+
+## Uso de IA
+
+A Gotinha usa o Gemini pelo Google ADK (`agente/gota_agente/agent.py`). Os prompts usados com ferramentas
+de IA no desenvolvimento estão em [prompts.md](prompts.md).
 
 ## Telas da comunidade
 
-| Âncora              | Tela        | O que tem                                                                                                    |
-| ------------------- | ----------- | ------------------------------------------------------------------------------------------------------------ |
-| `#inicio`           | Início      | Caixa d'água desenhada com o nível, sol/bomba, uma tarefa do dia por vez e três botões grandes.              |
-| `#horta`            | Minha horta | Foto da planta (resposta simulada) e canteiros, com o que precisa de cuidado primeiro e o aviso da câmera.   |
-| `#aprender`         | Aprender    | Lista de aulas (as terminadas aparecem como "Feita"). `#aprender/pulgao` abre direto uma aula.               |
-| `#vender`           | Vender      | Preço mínimo em formato de plaquinha de feira, a conta "quantos vai vender" e quem compra.                   |
+| Âncora              | Tela                | O que tem                                                                                                    |
+| ------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `#inicio`           | Início              | Caixa d'água desenhada com o nível, sol/bomba, uma tarefa do dia por vez e quatro botões grandes.           |
+| `#horta`            | Minha horta         | Foto da planta (resposta simulada) e canteiros, com o que precisa de cuidado primeiro e o aviso da câmera.   |
+| `#aprender`         | Aprender            | Lista de aulas (as terminadas aparecem como "Feita"). `#aprender/pulgao` abre direto uma aula.               |
+| `#vender`           | Vender              | Preço mínimo em formato de plaquinha de feira, a conta "quantos vai vender" e quem compra.                   |
+| `#conversar`        | Falar com a Gotinha | Botão de microfone (ou campo de texto), perguntas prontas e balões; a resposta é lida em voz alta.           |
 
 ## Área da ONG (`#parceiro`)
 
@@ -71,15 +199,19 @@ contato com tecnologia.
 - **Cor e palavra juntas.** Todo estado tem cor e texto ("Pode colher!", "Precisa de cuidado"), nunca só cor.
 - **Tocar para ouvir.** Todo cartão de informação lê em voz alta quando é tocado; o alto-falante pequeno no
   canto é sempre o mesmo sinal.
+- **Falar em vez de escrever.** A Gotinha ouve a pergunta pelo microfone e responde em voz alta.
 - **Perdoar o erro.** A tarefa marcada sem querer volta tocando na figura dela na fila.
 - **O app faz a conta.** Em Vender, o "−" e o "+" dizem quanto cobrar no total.
 - **Lembrar.** Tarefas do dia e aulas feitas ficam guardadas no aparelho.
-- **Sinal fraco.** Depois da primeira visita, o app abre sem internet (`public/sw.js`).
+- **Sinal fraco.** Depois da primeira visita, o app abre sem internet (`public/sw.js`), e sem a API usa os dados simulados.
 - **Audiodescrição em todo o app.** Cada tela tem um texto que diz o que tem nela e onde tocar
   (`useDescricao` em `src/lib/AudioDescricao.jsx`). Ele é lido sozinho quando a tela abre (depois do primeiro
   toque, que o navegador exige) e pode ser repetido no botão "Ouvir a tela". O botão redondo liga e desliga
   a leitura automática. Se o aparelho não tiver voz, tudo continua funcionando.
 - Foco visível no teclado, `prefers-reduced-motion` respeitado e emojis decorativos escondidos dos leitores de tela.
+
+Stack do front: React 19, Vite, Tailwind CSS v4 (tokens com `@theme static` em `src/index.css`) e ícones Phosphor
+(`react-icons/pi`). Sem biblioteca de rotas: a navegação usa a âncora da URL (`#tela` ou `#tela/detalhe`).
 
 ## Estrutura
 
@@ -87,38 +219,24 @@ contato com tecnologia.
 src/
   App.jsx                    navegação por âncora + AudioDescricaoProvider + BotaoAudio
   main.jsx, index.css        entrada, tokens visuais e registro do modo sem internet
-  data/mock.js               TODOS os dados simulados
+  data/mock.js               dados simulados (reserva quando a API não responde)
+  lib/api.js, lib/useApi.js  chamadas à API com reserva no mock.js
   lib/voz.js                 falar(), calar(), podeFalar() com speechSynthesis
   lib/AudioDescricao.jsx     contexto da audiodescrição e hook useDescricao
   lib/guardar.js             guardar no aparelho (localStorage) e vibrar
-  components/                Topo, BotaoAudio, CaixaDagua, CartaoFalante
-  pages/                     Inicio, Horta, Aprender, Vender, Parceiro
+  components/                Topo, BotaoAudio, CaixaDagua, CartaoFalante, Carregando
+  pages/                     Inicio, Horta, Aprender, Vender, Conversar, Parceiro
   pages/parceiro/            Comunidades, Comunidade, GraficoNivel, QuadroCamera, situacao.js
-public/
-  sw.js, manifest.webmanifest, icone.svg
-  cameras/                   fotos de exemplo das câmeras (licença livre, ver créditos)
+public/                      sw.js, manifest, ícone e fotos das câmeras
+backend/
+  app/                       rotas, cálculo do preço mínimo, FonteDePrecoReferencia e Gotinha
+  dados/                     referência da Ceasa, custo de produção e preços dos comerciantes
+  dados_iniciais.json        dados simulados iniciais
+  tests/                     testes com pytest
+agente/gota_agente/          Gotinha: agent.py (instrução) e ferramentas.py (chamadas à API)
+iot/                         sketch.ino, diagram.json e libraries.txt do Wokwi
+prompts.md                   registro do uso de IA
 ```
-
-## Onde entra a API Java
-
-Tudo o que o app mostra vem de `src/data/mock.js`. Para ligar na API, troque cada exportação por uma chamada
-(por exemplo, um `fetch` dentro de um hook `useDados`) mantendo o mesmo formato dos objetos:
-
-| Dado em `mock.js`                  | Origem na API                                                                 |
-| ---------------------------------- | ----------------------------------------------------------------------------- |
-| `usuaria`, `comunidade`            | Cadastro da família e da comunidade                                           |
-| `agua`                             | Sensor de nível da caixa, estado da bomba solar e previsão do tempo           |
-| `tarefas`                          | Tarefas do dia geradas a partir da horta, da água e das vendas                |
-| `canteiros`                        | Canteiros cadastrados e o diagnóstico das câmeras                             |
-| `cursos`                           | Conteúdo das aulas                                                            |
-| `precos`                           | Preço mínimo calculado com o custo da família e o preço local                 |
-| `compradores`                      | Compradores ligados à comunidade                                              |
-| `ong`                              | ONG do login (a API só devolve as comunidades dela)                           |
-| `comunidadesOng`, `creditosFotos`  | Leituras da caixa, bomba e testes da água; fotos e diagnóstico das câmeras    |
-
-Também são simulados: a análise da foto tirada pela família (`respostaFoto` em `src/pages/Horta.jsx`),
-as fotos das câmeras (fotos de exemplo do Wikimedia Commons) e as ações da ONG (enviar orientação,
-marcar visita), que hoje só mudam a tela.
 
 ## Licença
 
