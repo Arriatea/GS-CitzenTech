@@ -67,7 +67,7 @@ function VenderConteudo({ ir, precos, compradores }) {
     <div className="pagina">
       <Topo cor="amarelo" figura="💰" titulo="Vender" aoVoltar={() => ir('inicio')} />
 
-      <div className="px-4">
+      <div className="grade">
         <h2 className="mt-6 text-4xl font-extrabold">Quanto cobrar?</h2>
         <p className="mt-1 text-xl text-texto/80">Toque na verdura.</p>
 

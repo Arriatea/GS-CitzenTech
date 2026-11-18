@@ -126,7 +126,7 @@ function HortaConteudo({ ir, canteiros }) {
     <div className="pagina">
       <Topo cor="laranja" figura="🌱" titulo="Minha horta" aoVoltar={() => ir('inicio')} />
 
-      <div className="px-4">
+      <div className="grade">
         <label className="apertar mt-6 flex min-h-24 w-full items-center justify-center gap-3 rounded-[26px]! bg-texto px-6 font-titulo text-3xl font-bold text-white focus-within:outline-4 focus-within:outline-offset-3 focus-within:outline-texto">
           <PiCameraFill aria-hidden="true" className="size-10" />
           Tirar foto da planta

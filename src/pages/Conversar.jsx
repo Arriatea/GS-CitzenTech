@@ -153,7 +153,7 @@ export default function Conversar({ ir }) {
     <div className="pagina">
       <Topo cor="verde" figura="💬" titulo="Falar com a Gotinha" aoVoltar={() => ir('inicio')} />
 
-      <div className="px-4">
+      <div className="grade">
         <ol role="log" aria-label="Conversa" className="mt-6 flex flex-col gap-4">
           {mensagens.map((m, i) => (
             <Balao key={i} de={m.de} texto={m.texto} />

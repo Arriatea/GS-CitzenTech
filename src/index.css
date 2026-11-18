@@ -80,11 +80,29 @@
     border-radius: 28px;
   }
 
-  /* Coluna de celular. O padding de baixo deixa espaço para o BotaoAudio. */
+  /*
+   * Coluna de celular. O padding de baixo deixa espaço para o BotaoAudio.
+   * No computador a página ocupa a janela, e a .grade centraliza o conteúdo.
+   */
   .pagina {
     max-width: 480px;
     margin-inline: auto;
     padding-bottom: 8.5rem;
+
+    @variant md {
+      max-width: none;
+    }
+  }
+
+  /* Largura do conteúdo: no celular, só a margem dos lados; no computador, até 1200px no centro. */
+  .grade {
+    margin-inline: auto;
+    padding-inline: 1rem;
+
+    @variant md {
+      max-width: 75rem;
+      padding-inline: 2rem;
+    }
   }
 
   /* Resposta ao toque: o conteúdo novo entra com um pequeno pulo. */

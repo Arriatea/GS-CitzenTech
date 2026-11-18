@@ -27,7 +27,7 @@ function Lista({ ir, feitas, cursos }) {
     <div className="pagina">
       <Topo cor="azul" figura="📖" titulo="Aprender" aoVoltar={() => ir('inicio')} />
 
-      <ul className="mt-6 flex flex-col gap-5 px-4">
+      <ul className="grade mt-6 flex flex-col gap-5">
         {cursos.map((curso) => {
           const feita = feitas.includes(curso.id)
           return (
@@ -89,7 +89,7 @@ function Aula({ curso, voltar, aoTerminar }) {
     <div className="pagina">
       <Topo cor={curso.cor} figura={curso.figura} titulo={curso.titulo} rotuloVoltar="Aulas" aoVoltar={voltar} />
 
-      <div className="px-4">
+      <div className="grade">
         {fim ? (
           <section key="fim" className="cartao surgir mt-6 p-6">
             <p aria-hidden="true" className="text-8xl leading-none">

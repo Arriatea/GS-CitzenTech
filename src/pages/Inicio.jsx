@@ -168,7 +168,7 @@ function InicioConteudo({ ir, agua, tarefas }) {
 
   return (
     <div className="pagina">
-      <div className="px-4 pt-5">
+      <div className="grade pt-5">
         <Marca />
         <h1 className="mt-2 text-5xl font-extrabold">{ola}</h1>
 

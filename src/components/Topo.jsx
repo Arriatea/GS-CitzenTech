@@ -14,24 +14,26 @@ export default function Topo({ cor = 'laranja', figura, titulo, aoVoltar, rotulo
   const Icone = ehInicio ? PiHouseFill : PiArrowLeftBold
 
   return (
-    <header className={`${coresSecao[cor]} rounded-b-[32px] px-4 pt-4 pb-7`}>
-      <button
-        type="button"
-        onClick={aoVoltar}
-        className="apertar flex min-h-16 items-center gap-2 bg-white px-5 text-xl font-extrabold text-texto"
-      >
-        <Icone aria-hidden="true" className="size-7" />
-        {rotuloVoltar}
-      </button>
+    <header className={`${coresSecao[cor]} rounded-b-[32px] pt-4 pb-7`}>
+      <div className="grade">
+        <button
+          type="button"
+          onClick={aoVoltar}
+          className="apertar flex min-h-16 items-center gap-2 bg-white px-5 text-xl font-extrabold text-texto"
+        >
+          <Icone aria-hidden="true" className="size-7" />
+          {rotuloVoltar}
+        </button>
 
-      <h1 className="mt-6 flex items-center gap-3 text-5xl font-extrabold">
-        {figura && (
-          <span aria-hidden="true" className="text-6xl leading-none">
-            {figura}
-          </span>
-        )}
-        <span>{titulo}</span>
-      </h1>
+        <h1 className="mt-6 flex items-center gap-3 text-5xl font-extrabold">
+          {figura && (
+            <span aria-hidden="true" className="text-6xl leading-none">
+              {figura}
+            </span>
+          )}
+          <span>{titulo}</span>
+        </h1>
+      </div>
     </header>
   )
 }
