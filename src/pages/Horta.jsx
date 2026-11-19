@@ -30,7 +30,7 @@ function Canteiro({ canteiro, ir }) {
     .join(' ')
 
   return (
-    <li className={`cartao overflow-hidden ${cuidado ? estado.borda : ''}`}>
+    <li className={`cartao overflow-hidden ${cuidado ? `${estado.borda} md:col-span-full` : ''}`}>
       <CartaoFalante fala={fala} className="p-4 pr-12">
         <span className="flex items-center gap-3">
           <span aria-hidden="true" className="text-6xl leading-none">
@@ -47,9 +47,9 @@ function Canteiro({ canteiro, ir }) {
       </CartaoFalante>
 
       {cuidado && (
-        <div className="px-4 pb-5">
+        <div className="px-4 pb-5 lg:flex lg:items-center lg:gap-4">
           {canteiro.aviso && (
-            <p className="mb-4 flex items-center gap-2 rounded-2xl bg-vermelho/10 px-4 py-3 text-xl font-bold">
+            <p className="mb-4 flex items-center gap-2 rounded-2xl bg-vermelho/10 px-4 py-3 text-xl font-bold lg:mb-0 lg:min-h-16 lg:flex-1">
               <PiVideoCameraFill aria-hidden="true" className="size-6 shrink-0 text-vermelho" />
               {canteiro.aviso}
             </p>
@@ -58,7 +58,7 @@ function Canteiro({ canteiro, ir }) {
             <button
               type="button"
               onClick={() => ir('aprender', canteiro.aula)}
-              className="apertar flex min-h-16 w-full items-center justify-center gap-2 bg-vermelho px-5 text-xl font-bold text-white"
+              className="apertar flex min-h-16 w-full items-center justify-center gap-2 bg-vermelho px-5 text-xl font-bold text-white lg:w-auto lg:px-10"
             >
               <PiFirstAidKitFill aria-hidden="true" className="size-7" />
               Como cuidar
@@ -134,9 +134,9 @@ function HortaConteudo({ ir, canteiros }) {
         </label>
 
         {foto && (
-          <section aria-label="Foto da planta" className="cartao surgir mt-6 overflow-hidden">
-            <img src={foto} alt="A foto que você tirou" className="h-60 w-full object-cover" />
-            <div className="p-5" aria-live="polite">
+          <section aria-label="Foto da planta" className="cartao surgir mt-6 overflow-hidden md:flex">
+            <img src={foto} alt="A foto que você tirou" className="h-60 w-full object-cover md:h-auto md:min-h-60 md:w-2/5" />
+            <div className="p-5 md:flex-1 md:p-7" aria-live="polite">
               {situacao === 'olhando' ? (
                 <p className="flex items-center gap-3 font-titulo text-3xl font-bold">
                   <span aria-hidden="true" className="pulsar">
@@ -170,7 +170,7 @@ function HortaConteudo({ ir, canteiros }) {
 
         <h2 className="mt-10 text-4xl font-extrabold">Para vender</h2>
         <p className="text-xl text-texto/80">Estes você vende. Eles pagam a casa e a bomba.</p>
-        <ul className="mt-4 flex flex-col gap-4">
+        <ul className="mt-4 flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
           {venda.map((c) => (
             <Canteiro key={c.id} canteiro={c} ir={ir} />
           ))}
@@ -178,7 +178,7 @@ function HortaConteudo({ ir, canteiros }) {
 
         <h2 className="mt-10 text-4xl font-extrabold">Para a comunidade</h2>
         <p className="text-xl text-texto/80">Comida para as famílias da comunidade.</p>
-        <ul className="mt-4 flex flex-col gap-4">
+        <ul className="mt-4 flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
           {daComunidade.map((c) => (
             <Canteiro key={c.id} canteiro={c} ir={ir} />
           ))}
