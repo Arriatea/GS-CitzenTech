@@ -9,6 +9,9 @@ const Reconhecimento = typeof window !== 'undefined' ? window.SpeechRecognition 
 
 const perguntasProntas = ['A água está boa?', 'O que eu colho hoje?', 'Quanto cobro na alface?']
 
+// No computador (a partir do md do Tailwind) também dá para escrever, mesmo com microfone.
+const TELA_LARGA = '(min-width: 48rem)'
+
 const saudacao = { de: 'gotinha', texto: 'Oi! Eu sou a Gotinha. Pode perguntar da água, da horta ou dos preços.' }
 
 function lerDaVisita(chave, padrao) {
@@ -96,6 +99,15 @@ export default function Conversar({ ir }) {
   const [texto, setTexto] = useState('')
   const reconhecedor = useRef(null)
   const fim = useRef(null)
+  const [largo, setLargo] = useState(() => window.matchMedia?.(TELA_LARGA).matches ?? false)
+
+  useEffect(() => {
+    const consulta = window.matchMedia?.(TELA_LARGA)
+    if (!consulta) return
+    const aoMudar = (evento) => setLargo(evento.matches)
+    consulta.addEventListener('change', aoMudar)
+    return () => consulta.removeEventListener('change', aoMudar)
+  }, [])
 
   useEffect(() => {
     gravarNaVisita('conversa-gotinha', mensagens)
@@ -163,7 +175,9 @@ export default function Conversar({ ir }) {
 
   const ultimaResposta = [...mensagens].reverse().find((m) => m.de === 'gotinha')
   const comoPerguntar = Reconhecimento
-    ? 'Logo abaixo da conversa tem o botão verde Falar: toque nele e diga sua pergunta.'
+    ? `Logo abaixo da conversa tem o botão verde Falar: toque nele e diga sua pergunta.${
+        largo ? ' Ou escreva a pergunta no campo embaixo dele e toque em Enviar.' : ''
+      }`
     : 'Logo abaixo da conversa tem um campo para escrever a pergunta e o botão Enviar.'
 
   useDescricao(
@@ -196,7 +210,7 @@ export default function Conversar({ ir }) {
           </ol>
 
           <div ref={fim} className="scroll-mb-36">
-            {Reconhecimento ? (
+            {Reconhecimento && (
               <button
                 type="button"
                 onClick={falar}
@@ -217,29 +231,35 @@ export default function Conversar({ ir }) {
                   </>
                 )}
               </button>
-            ) : (
-              <form onSubmit={aoEnviarTexto} className="mt-8 flex flex-col gap-3">
-                <label htmlFor="pergunta" className="text-2xl font-bold">
-                  Escreva sua pergunta
-                </label>
+            )}
+
+            {/* Sem microfone no navegador, só escrevendo. No computador, o campo aparece também embaixo do Falar. */}
+            <form
+              onSubmit={aoEnviarTexto}
+              className={`flex-col gap-3 ${Reconhecimento ? 'mt-6 hidden md:flex' : 'mt-8 flex'}`}
+            >
+              <label htmlFor="pergunta" className="text-2xl font-bold">
+                {Reconhecimento ? 'Ou escreva sua pergunta' : 'Escreva sua pergunta'}
+              </label>
+              <div className="flex flex-col gap-3 md:flex-row">
                 <input
                   id="pergunta"
                   type="text"
                   value={texto}
                   onChange={(e) => setTexto(e.target.value)}
                   autoComplete="off"
-                  className="min-h-16 rounded-[22px] border-4 border-nuvem bg-white px-5 text-xl"
+                  className="min-h-16 rounded-[22px] border-4 border-nuvem bg-white px-5 text-xl md:min-w-0 md:flex-1"
                 />
                 <button
                   type="submit"
                   disabled={esperando || !texto.trim()}
-                  className="apertar flex min-h-16 items-center justify-center gap-2 bg-verde px-5 text-2xl font-extrabold text-white"
+                  className="apertar flex min-h-16 items-center justify-center gap-2 bg-verde px-5 text-2xl font-extrabold text-white md:px-8"
                 >
                   <PiPaperPlaneRightFill aria-hidden="true" className="size-7" />
                   Enviar
                 </button>
-              </form>
-            )}
+              </div>
+            </form>
 
             {aviso && (
               <p role="status" className="mt-3 text-xl font-bold text-vermelho">
