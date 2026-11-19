@@ -1,4 +1,5 @@
 # Blueprint do Render: no painel, New > Blueprint e escolha este repositório.
+# Aqui fica só a API. O front é publicado na Vercel.
 services:
   # API (FastAPI) com a Gotinha. Roda da raiz para enxergar a pasta agente/.
   - type: web
@@ -19,22 +20,3 @@ services:
         value: "FALSE"
       - key: GOOGLE_API_KEY
         sync: false
-
-  # Front (React + Vite) como site estático.
-  - type: web
-    name: gota-a-gota
-    runtime: static
-    buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
-    buildFilter:
-      paths:
-        - src/**
-        - public/**
-        - index.html
-        - package.json
-        - package-lock.json
-        - vite.config.js
-    envVars:
-      # Troque se o Render der outro endereço para a API.
-      - key: VITE_API_URL
-        value: https://gota-a-gota-api.onrender.com
