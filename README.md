@@ -52,6 +52,7 @@ a bomba solar, a qualidade da água e a saúde da horta pelas câmeras.
 | --- | --- | --- |
 | **Front** (o app) | https://gs-citzen-tech.vercel.app | Vercel |
 | **API** (backend + Gotinha) | https://gota-a-gota-api.onrender.com | Render |
+| **ESP32** (sensores simulados) | https://wokwi.com/projects/481155588582382593 | Wokwi |
 
 Para ver a API respondendo: [/saude](https://gota-a-gota-api.onrender.com/saude),
 [/agua](https://gota-a-gota-api.onrender.com/agua) e
@@ -119,6 +120,15 @@ Para ver a API respondendo: [/saude](https://gota-a-gota-api.onrender.com/saude)
   <br>
   <sub>O display mostra o sol, a bomba e o nível da caixa; embaixo, as leituras em JSON que vão para a API.</sub>
 </div>
+
+Para ver as leituras chegando no app publicado:
+
+1. Abra o [projeto no Wokwi](https://wokwi.com/projects/481155588582382593) e aperte o play.
+2. Espere aparecer `API /leituras: 201` no monitor serial (o ESP32 envia a cada 10 segundos).
+3. Abra o [app publicado](https://gs-citzen-tech.vercel.app): a tela Início muda sozinha em até 5 segundos.
+4. Clique no sensor de nível da caixa e mude a distância para ver a água subir ou descer no app.
+
+A simulação roda no navegador: as leituras param quando a aba do Wokwi é fechada.
 
 ## As partes
 
