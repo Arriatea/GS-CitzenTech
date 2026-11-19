@@ -172,98 +172,101 @@ function InicioConteudo({ ir, agua, tarefas }) {
         <Marca />
         <h1 className="mt-2 text-5xl font-extrabold">{ola}</h1>
 
-        {/* Água: a caixa desenhada com o nível, e as palavras ao lado. Toque para ouvir. */}
-        <section aria-label="Água" className="mt-7">
-          <CartaoFalante
-            fala={falaAgua}
-            claro
-            className={`rounded-[32px] px-6 pt-6 pb-5 text-white ${agua.boa ? 'bg-verde' : 'bg-vermelho'}`}
-          >
-            <span className="flex items-center justify-between gap-4 pr-6">
-              <span>
-                <span className="block font-titulo text-[2.5rem] leading-tight font-extrabold whitespace-nowrap">
-                  {agua.boa ? 'Água boa' : 'Água ruim'}
+        {/* No computador, a água e a tarefa ficam lado a lado. */}
+        <div className="mt-7 lg:grid lg:grid-cols-2 lg:gap-5">
+          {/* Água: a caixa desenhada com o nível, e as palavras ao lado. Toque para ouvir. */}
+          <section aria-label="Água">
+            <CartaoFalante
+              fala={falaAgua}
+              claro
+              className={`rounded-[32px] px-6 pt-6 pb-5 text-white lg:h-full ${agua.boa ? 'bg-verde' : 'bg-vermelho'}`}
+            >
+              <span className="flex items-center justify-between gap-4 pr-6">
+                <span>
+                  <span className="block font-titulo text-[2.5rem] leading-tight font-extrabold whitespace-nowrap">
+                    {agua.boa ? 'Água boa' : 'Água ruim'}
+                  </span>
+                  <span className="mt-1 block text-xl font-bold">{textoCaixa[agua.caixa]}</span>
                 </span>
-                <span className="mt-1 block text-xl font-bold">{textoCaixa[agua.caixa]}</span>
+                <CaixaDagua caixa={agua.caixa} className="h-28 w-auto shrink-0" />
               </span>
-              <CaixaDagua caixa={agua.caixa} className="h-28 w-auto shrink-0" />
-            </span>
-            <span className="mt-4 block border-t-2 border-white/30 pt-4 text-xl">
-              {agua.boa ? `Se o carro-pipa atrasar, tem água para beber por ${dias}.` : 'Não beba a água do poço agora.'}
-            </span>
-            {agua.caixa === 'pouca' && (
-              <span className="mt-2 block text-xl font-extrabold">Use a água da caixa só para beber.</span>
-            )}
-            <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-lg font-bold">
-              <span aria-hidden="true">{temSol ? '☀️' : '☁️'}</span>
-              {temSol ? 'Tem sol: a bomba está ligada' : 'Sem sol: a horta usa a caixa'}
-            </span>
-          </CartaoFalante>
-        </section>
+              <span className="mt-4 block border-t-2 border-white/30 pt-4 text-xl">
+                {agua.boa ? `Se o carro-pipa atrasar, tem água para beber por ${dias}.` : 'Não beba a água do poço agora.'}
+              </span>
+              {agua.caixa === 'pouca' && (
+                <span className="mt-2 block text-xl font-extrabold">Use a água da caixa só para beber.</span>
+              )}
+              <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-lg font-bold">
+                <span aria-hidden="true">{temSol ? '☀️' : '☁️'}</span>
+                {temSol ? 'Tem sol: a bomba está ligada' : 'Sem sol: a horta usa a caixa'}
+              </span>
+            </CartaoFalante>
+          </section>
 
-        {/* Uma tarefa por vez */}
-        <section aria-label="Tarefa de hoje" className="cartao mt-6 p-5">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-3xl font-bold whitespace-nowrap">Para hoje</h2>
-            <FilaDeTarefas tarefas={tarefas} atual={indice} voltarPara={voltarPara} />
-          </div>
-
-          {tudoFeito ? (
-            <div key="fim" className="surgir mt-6">
-              <p className="text-7xl leading-none" aria-hidden="true">
-                🎉
-              </p>
-              <p className="mt-3 font-titulo text-4xl font-extrabold">Tudo feito!</p>
-              <p className="mt-1 text-xl text-texto/80">Amanhã tem tarefas novas.</p>
-              <button
-                type="button"
-                onClick={() => setIndice(0)}
-                className="apertar mt-6 min-h-16 w-full border-4 border-nuvem bg-white px-5 text-xl font-bold"
-              >
-                Ver de novo
-              </button>
+          {/* Uma tarefa por vez */}
+          <section aria-label="Tarefa de hoje" className="cartao mt-6 p-5 lg:mt-0">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-3xl font-bold whitespace-nowrap">Para hoje</h2>
+              <FilaDeTarefas tarefas={tarefas} atual={indice} voltarPara={voltarPara} />
             </div>
-          ) : (
-            <div key={tarefa.id} className="surgir mt-5">
-              <div className="flex items-start gap-4">
-                <span aria-hidden="true" className="text-7xl leading-none">
-                  {tarefa.figura}
-                </span>
-                <div>
-                  <p className="font-titulo text-3xl leading-tight font-bold">{tarefa.texto}</p>
-                  <p className="mt-1 text-xl text-texto/80">{tarefa.dica}</p>
-                </div>
-              </div>
-              <p className="sr-only">
-                Tarefa {indice + 1} de {tarefas.length}.
-              </p>
 
-              <div className="mt-6 flex gap-3">
+            {tudoFeito ? (
+              <div key="fim" className="surgir mt-6">
+                <p className="text-7xl leading-none" aria-hidden="true">
+                  🎉
+                </p>
+                <p className="mt-3 font-titulo text-4xl font-extrabold">Tudo feito!</p>
+                <p className="mt-1 text-xl text-texto/80">Amanhã tem tarefas novas.</p>
                 <button
                   type="button"
-                  onClick={jaFiz}
-                  className="apertar flex min-h-16 flex-1 items-center justify-center gap-2 bg-verde px-5 text-2xl font-extrabold text-white"
+                  onClick={() => setIndice(0)}
+                  className="apertar mt-6 min-h-16 w-full border-4 border-nuvem bg-white px-5 text-xl font-bold"
                 >
-                  <PiCheckBold aria-hidden="true" className="size-7" />
-                  Já fiz
+                  Ver de novo
                 </button>
-                {tarefa.aula && (
+              </div>
+            ) : (
+              <div key={tarefa.id} className="surgir mt-5">
+                <div className="flex items-start gap-4">
+                  <span aria-hidden="true" className="text-7xl leading-none">
+                    {tarefa.figura}
+                  </span>
+                  <div>
+                    <p className="font-titulo text-3xl leading-tight font-bold">{tarefa.texto}</p>
+                    <p className="mt-1 text-xl text-texto/80">{tarefa.dica}</p>
+                  </div>
+                </div>
+                <p className="sr-only">
+                  Tarefa {indice + 1} de {tarefas.length}.
+                </p>
+
+                <div className="mt-6 flex gap-3">
                   <button
                     type="button"
-                    onClick={() => ir('aprender', tarefa.aula)}
-                    className="apertar flex min-h-16 items-center justify-center gap-2 border-4 border-nuvem bg-white px-4 text-xl font-bold"
+                    onClick={jaFiz}
+                    className="apertar flex min-h-16 flex-1 items-center justify-center gap-2 bg-verde px-5 text-2xl font-extrabold text-white"
                   >
-                    <PiQuestionBold aria-hidden="true" className="size-6" />
-                    Como faz?
+                    <PiCheckBold aria-hidden="true" className="size-7" />
+                    Já fiz
                   </button>
-                )}
+                  {tarefa.aula && (
+                    <button
+                      type="button"
+                      onClick={() => ir('aprender', tarefa.aula)}
+                      className="apertar flex min-h-16 items-center justify-center gap-2 border-4 border-nuvem bg-white px-4 text-xl font-bold"
+                    >
+                      <PiQuestionBold aria-hidden="true" className="size-6" />
+                      Como faz?
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </section>
+            )}
+          </section>
+        </div>
 
-        {/* As três partes do app */}
-        <nav aria-label="Partes do app" className="mt-8 flex flex-col gap-5">
+        {/* As quatro partes do app */}
+        <nav aria-label="Partes do app" className="mt-8 flex flex-col gap-5 md:grid md:grid-cols-2">
           {secoes.map((s) => (
             <button
               key={s.destino}
