@@ -87,21 +87,29 @@ void conectarWifi() {
   Serial.println(WiFi.status() == WL_CONNECTED ? "Wi-Fi conectado" : "Sem Wi-Fi: segue só no Serial");
 }
 
+// A conexão segura (HTTPS) é lenta de abrir no simulador. Por isso ela fica aberta
+// entre um envio e outro, e o ESP32 espera até 20 segundos pela resposta.
+WiFiClientSecure clienteApi;
+HTTPClient http;
+
 // Envia a leitura para a API. Se a API demorar (o Render grátis "dorme"), tenta de novo no próximo envio.
 void enviarParaApi(const String& json) {
   if (WiFi.status() != WL_CONNECTED) {
     WiFi.reconnect();
     return;
   }
-  WiFiClientSecure cliente;
-  cliente.setInsecure();
-  HTTPClient http;
-  http.setTimeout(8000);
-  http.begin(cliente, API_LEITURAS);
+  clienteApi.setInsecure();
+  http.setReuse(true);
+  http.setConnectTimeout(20000);
+  http.setTimeout(20000);
+  http.begin(clienteApi, API_LEITURAS);
   http.addHeader("Content-Type", "application/json");
   int codigo = http.POST(json);
   Serial.print("API /leituras: ");
   Serial.println(codigo);
+  if (codigo > 0) {
+    http.getString();  // lê a resposta até o fim para a conexão poder ser usada de novo
+  }
   http.end();
 }
 
@@ -197,8 +205,8 @@ void loop() {
     Serial.println(json);
 
     if (millis() - ultimoEnvioApi > ENVIO_API_MS) {
-      ultimoEnvioApi = millis();
       enviarParaApi(json);
+      ultimoEnvioApi = millis();  // conta os 10 segundos a partir do fim do envio
     }
   }
 
