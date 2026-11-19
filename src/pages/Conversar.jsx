@@ -9,9 +9,6 @@ const Reconhecimento = typeof window !== 'undefined' ? window.SpeechRecognition 
 
 const perguntasProntas = ['A água está boa?', 'O que eu colho hoje?', 'Quanto cobro na alface?']
 
-// No computador (a partir do md do Tailwind) também dá para escrever, mesmo com microfone.
-const TELA_LARGA = '(min-width: 48rem)'
-
 // Alguns celulares (iPhone) não avisam quando param de ouvir: depois desse tempo, o botão volta sozinho.
 const TEMPO_MAXIMO_OUVINDO_MS = 20000
 
@@ -102,18 +99,7 @@ export default function Conversar({ ir }) {
   const [texto, setTexto] = useState('')
   const reconhecedor = useRef(null)
   const vigia = useRef(null)
-  // Se o microfone falhar, o campo de escrever aparece também no celular.
-  const [microfoneFalhou, setMicrofoneFalhou] = useState(false)
   const fim = useRef(null)
-  const [largo, setLargo] = useState(() => window.matchMedia?.(TELA_LARGA).matches ?? false)
-
-  useEffect(() => {
-    const consulta = window.matchMedia?.(TELA_LARGA)
-    if (!consulta) return
-    const aoMudar = (evento) => setLargo(evento.matches)
-    consulta.addEventListener('change', aoMudar)
-    return () => consulta.removeEventListener('change', aoMudar)
-  }, [])
 
   useEffect(() => {
     gravarNaVisita('conversa-gotinha', mensagens)
@@ -175,7 +161,6 @@ export default function Conversar({ ir }) {
 
   function microfoneNaoFuncionou(erro) {
     pararDeOuvir()
-    setMicrofoneFalhou(true)
     const semPermissao = erro === 'not-allowed' || erro === 'service-not-allowed'
     const mensagem = semPermissao
       ? 'O microfone não está liberado neste aparelho. Escreva a pergunta aqui embaixo ou toque numa pergunta pronta.'
@@ -227,9 +212,7 @@ export default function Conversar({ ir }) {
 
   const ultimaResposta = [...mensagens].reverse().find((m) => m.de === 'gotinha')
   const comoPerguntar = Reconhecimento
-    ? `Logo abaixo da conversa tem o botão verde Falar: toque nele e diga sua pergunta.${
-        largo || microfoneFalhou ? ' Ou escreva a pergunta no campo embaixo dele e toque em Enviar.' : ''
-      }`
+    ? 'Logo abaixo da conversa tem o botão verde Falar: toque nele e diga sua pergunta. Ou escreva a pergunta no campo embaixo dele e toque em Enviar.'
     : 'Logo abaixo da conversa tem um campo para escrever a pergunta e o botão Enviar.'
 
   useDescricao(
@@ -291,14 +274,8 @@ export default function Conversar({ ir }) {
               </p>
             )}
 
-            {/* Sem microfone no navegador, só escrevendo. No computador, o campo aparece também embaixo do Falar.
-                No celular, o campo aparece se o microfone falhar. */}
-            <form
-              onSubmit={aoEnviarTexto}
-              className={`flex-col gap-3 ${
-                Reconhecimento ? `mt-6 md:flex ${microfoneFalhou ? 'flex' : 'hidden'}` : 'mt-8 flex'
-              }`}
-            >
+            {/* O campo de escrever aparece sempre: o microfone não funciona em todo aparelho (iPhone, por exemplo). */}
+            <form onSubmit={aoEnviarTexto} className={`flex flex-col gap-3 ${Reconhecimento ? 'mt-6' : 'mt-8'}`}>
               <label htmlFor="pergunta" className="text-2xl font-bold">
                 {Reconhecimento ? 'Ou escreva sua pergunta' : 'Escreva sua pergunta'}
               </label>
