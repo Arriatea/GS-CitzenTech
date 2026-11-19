@@ -6,8 +6,8 @@ export default function BotaoAudio({ largo = false }) {
   const { ligado, falando, ouvirTela, parar, alternarLigado } = useAudioDescricao()
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 px-4 pb-4">
-      <div className={`mx-auto flex items-end justify-end gap-3 ${largo ? 'max-w-5xl' : 'max-w-[480px]'}`}>
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 px-4 pb-4 md:px-6 md:pb-6">
+      <div className={`mx-auto flex items-end justify-end gap-3 md:max-w-none ${largo ? 'max-w-5xl' : 'max-w-[480px]'}`}>
         <button
           type="button"
           onClick={alternarLigado}
