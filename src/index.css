@@ -105,6 +105,13 @@
     }
   }
 
+  /* Para ler um passo por vez (a aula): no computador, até 720px de texto. */
+  .grade-estreita {
+    @variant md {
+      max-width: 49rem;
+    }
+  }
+
   /* Resposta ao toque: o conteúdo novo entra com um pequeno pulo. */
   .surgir {
     animation: surgir 280ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both;

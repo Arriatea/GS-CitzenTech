@@ -27,7 +27,7 @@ function Lista({ ir, feitas, cursos }) {
     <div className="pagina">
       <Topo cor="azul" figura="📖" titulo="Aprender" aoVoltar={() => ir('inicio')} />
 
-      <ul className="grade mt-6 flex flex-col gap-5">
+      <ul className="grade mt-6 flex flex-col gap-5 md:grid md:grid-cols-2">
         {cursos.map((curso) => {
           const feita = feitas.includes(curso.id)
           return (
@@ -87,9 +87,9 @@ function Aula({ curso, voltar, aoTerminar }) {
 
   return (
     <div className="pagina">
-      <Topo cor={curso.cor} figura={curso.figura} titulo={curso.titulo} rotuloVoltar="Aulas" aoVoltar={voltar} />
+      <Topo cor={curso.cor} figura={curso.figura} titulo={curso.titulo} rotuloVoltar="Aulas" aoVoltar={voltar} estreito />
 
-      <div className="grade">
+      <div className="grade grade-estreita">
         {fim ? (
           <section key="fim" className="cartao surgir mt-6 p-6">
             <p aria-hidden="true" className="text-8xl leading-none">
@@ -132,11 +132,11 @@ function Aula({ curso, voltar, aoTerminar }) {
               </div>
             </div>
 
-            <section key={passo} className="cartao surgir mt-5 p-6">
-              <p aria-hidden="true" className="text-8xl leading-none">
+            <section key={passo} className="cartao surgir mt-5 p-6 md:flex md:items-center md:gap-8 md:p-8">
+              <p aria-hidden="true" className="text-8xl leading-none md:shrink-0">
                 {atual.figura}
               </p>
-              <p className="mt-5 font-titulo text-4xl leading-tight font-bold">{atual.texto}</p>
+              <p className="mt-5 font-titulo text-4xl leading-tight font-bold md:mt-0">{atual.texto}</p>
             </section>
 
             <div className="mt-6 flex gap-4">

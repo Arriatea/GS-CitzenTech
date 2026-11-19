@@ -9,13 +9,13 @@ export const coresSecao = {
   vermelho: 'bg-vermelho text-white',
 }
 
-export default function Topo({ cor = 'laranja', figura, titulo, aoVoltar, rotuloVoltar = 'Início' }) {
+export default function Topo({ cor = 'laranja', figura, titulo, aoVoltar, rotuloVoltar = 'Início', estreito = false }) {
   const ehInicio = rotuloVoltar === 'Início'
   const Icone = ehInicio ? PiHouseFill : PiArrowLeftBold
 
   return (
     <header className={`${coresSecao[cor]} rounded-b-[32px] pt-4 pb-7`}>
-      <div className="grade">
+      <div className={estreito ? 'grade grade-estreita' : 'grade'}>
         <button
           type="button"
           onClick={aoVoltar}
