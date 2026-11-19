@@ -55,6 +55,29 @@ function Balao({ de, texto }) {
   )
 }
 
+/* No celular, as perguntas prontas ficam embaixo do botão; no computador, numa coluna ao lado da conversa. */
+function PerguntasProntas({ enviar, esperando, className = '' }) {
+  return (
+    <div className={className}>
+      <h2 className="mt-8 text-3xl font-bold lg:mt-0">Perguntas prontas</h2>
+      <ul className="mt-3 flex flex-col gap-3">
+        {perguntasProntas.map((p) => (
+          <li key={p}>
+            <button
+              type="button"
+              onClick={() => enviar(p)}
+              disabled={esperando}
+              className="apertar min-h-16 w-full border-4 border-nuvem bg-white px-5 text-left text-xl font-bold"
+            >
+              {p}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export default function Conversar({ ir }) {
   const { parar, dizer, ligado } = useAudioDescricao()
   const ligadoRef = useRef(ligado)
@@ -153,91 +176,82 @@ export default function Conversar({ ir }) {
     <div className="pagina">
       <Topo cor="verde" figura="💬" titulo="Falar com a Gotinha" aoVoltar={() => ir('inicio')} />
 
-      <div className="grade">
-        <ol role="log" aria-label="Conversa" className="mt-6 flex flex-col gap-4">
-          {mensagens.map((m, i) => (
-            <Balao key={i} de={m.de} texto={m.texto} />
-          ))}
-          {esperando && (
-            <li className="surgir flex justify-start">
-              <p className="cartao flex items-center gap-3 rounded-bl-md! px-5 py-4 text-xl font-bold">
-                <span aria-hidden="true" className="pulsar text-3xl leading-none">
-                  💭
-                </span>
-                A Gotinha está pensando…
-              </p>
-            </li>
-          )}
-        </ol>
-
-        <div ref={fim} className="scroll-mb-36">
-          {Reconhecimento ? (
-            <button
-              type="button"
-              onClick={falar}
-              disabled={esperando}
-              className={`apertar mt-8 flex min-h-24 w-full items-center justify-center gap-3 rounded-[26px]! px-6 font-titulo text-3xl font-extrabold text-white ${
-                ouvindo ? 'bg-vermelho' : 'bg-verde'
-              }`}
-            >
-              {ouvindo ? (
-                <>
-                  <PiStopFill aria-hidden="true" className="pulsar size-10" />
-                  Ouvindo… toque para parar
-                </>
-              ) : (
-                <>
-                  <PiMicrophoneFill aria-hidden="true" className="size-10" />
-                  Falar
-                </>
-              )}
-            </button>
-          ) : (
-            <form onSubmit={aoEnviarTexto} className="mt-8 flex flex-col gap-3">
-              <label htmlFor="pergunta" className="text-2xl font-bold">
-                Escreva sua pergunta
-              </label>
-              <input
-                id="pergunta"
-                type="text"
-                value={texto}
-                onChange={(e) => setTexto(e.target.value)}
-                autoComplete="off"
-                className="min-h-16 rounded-[22px] border-4 border-nuvem bg-white px-5 text-xl"
-              />
-              <button
-                type="submit"
-                disabled={esperando || !texto.trim()}
-                className="apertar flex min-h-16 items-center justify-center gap-2 bg-verde px-5 text-2xl font-extrabold text-white"
-              >
-                <PiPaperPlaneRightFill aria-hidden="true" className="size-7" />
-                Enviar
-              </button>
-            </form>
-          )}
-
-          {aviso && (
-            <p role="status" className="mt-3 text-xl font-bold text-vermelho">
-              {aviso}
-            </p>
-          )}
-
-          <h2 className="mt-8 text-3xl font-bold">Perguntas prontas</h2>
-          <ul className="mt-3 flex flex-col gap-3">
-            {perguntasProntas.map((p) => (
-              <li key={p}>
-                <button
-                  type="button"
-                  onClick={() => enviar(p)}
-                  disabled={esperando}
-                  className="apertar min-h-16 w-full border-4 border-nuvem bg-white px-5 text-left text-xl font-bold"
-                >
-                  {p}
-                </button>
-              </li>
+      {/* No computador, a conversa fica com até 760px e as perguntas prontas ao lado. */}
+      <div className="grade lg:grid lg:grid-cols-[minmax(0,47.5rem)_minmax(0,1fr)] lg:items-start lg:gap-x-10">
+        <div>
+          <ol role="log" aria-label="Conversa" className="mt-6 flex flex-col gap-4">
+            {mensagens.map((m, i) => (
+              <Balao key={i} de={m.de} texto={m.texto} />
             ))}
-          </ul>
+            {esperando && (
+              <li className="surgir flex justify-start">
+                <p className="cartao flex items-center gap-3 rounded-bl-md! px-5 py-4 text-xl font-bold">
+                  <span aria-hidden="true" className="pulsar text-3xl leading-none">
+                    💭
+                  </span>
+                  A Gotinha está pensando…
+                </p>
+              </li>
+            )}
+          </ol>
+
+          <div ref={fim} className="scroll-mb-36">
+            {Reconhecimento ? (
+              <button
+                type="button"
+                onClick={falar}
+                disabled={esperando}
+                className={`apertar mt-8 flex min-h-24 w-full items-center justify-center gap-3 rounded-[26px]! px-6 font-titulo text-3xl font-extrabold text-white ${
+                  ouvindo ? 'bg-vermelho' : 'bg-verde'
+                }`}
+              >
+                {ouvindo ? (
+                  <>
+                    <PiStopFill aria-hidden="true" className="pulsar size-10" />
+                    Ouvindo… toque para parar
+                  </>
+                ) : (
+                  <>
+                    <PiMicrophoneFill aria-hidden="true" className="size-10" />
+                    Falar
+                  </>
+                )}
+              </button>
+            ) : (
+              <form onSubmit={aoEnviarTexto} className="mt-8 flex flex-col gap-3">
+                <label htmlFor="pergunta" className="text-2xl font-bold">
+                  Escreva sua pergunta
+                </label>
+                <input
+                  id="pergunta"
+                  type="text"
+                  value={texto}
+                  onChange={(e) => setTexto(e.target.value)}
+                  autoComplete="off"
+                  className="min-h-16 rounded-[22px] border-4 border-nuvem bg-white px-5 text-xl"
+                />
+                <button
+                  type="submit"
+                  disabled={esperando || !texto.trim()}
+                  className="apertar flex min-h-16 items-center justify-center gap-2 bg-verde px-5 text-2xl font-extrabold text-white"
+                >
+                  <PiPaperPlaneRightFill aria-hidden="true" className="size-7" />
+                  Enviar
+                </button>
+              </form>
+            )}
+
+            {aviso && (
+              <p role="status" className="mt-3 text-xl font-bold text-vermelho">
+                {aviso}
+              </p>
+            )}
+
+            <PerguntasProntas enviar={enviar} esperando={esperando} className="lg:hidden" />
+          </div>
         </div>
+
+        <PerguntasProntas enviar={enviar} esperando={esperando} className="hidden lg:sticky lg:top-6 lg:mt-6 lg:block" />
       </div>
     </div>
   )
