@@ -12,6 +12,9 @@ const perguntasProntas = ['A água está boa?', 'O que eu colho hoje?', 'Quanto 
 // No computador (a partir do md do Tailwind) também dá para escrever, mesmo com microfone.
 const TELA_LARGA = '(min-width: 48rem)'
 
+// Alguns celulares (iPhone) não avisam quando param de ouvir: depois desse tempo, o botão volta sozinho.
+const TEMPO_MAXIMO_OUVINDO_MS = 20000
+
 const saudacao = { de: 'gotinha', texto: 'Oi! Eu sou a Gotinha. Pode perguntar da água, da horta ou dos preços.' }
 
 function lerDaVisita(chave, padrao) {
@@ -98,6 +101,9 @@ export default function Conversar({ ir }) {
   const [aviso, setAviso] = useState('')
   const [texto, setTexto] = useState('')
   const reconhecedor = useRef(null)
+  const vigia = useRef(null)
+  // Se o microfone falhar, o campo de escrever aparece também no celular.
+  const [microfoneFalhou, setMicrofoneFalhou] = useState(false)
   const fim = useRef(null)
   const [largo, setLargo] = useState(() => window.matchMedia?.(TELA_LARGA).matches ?? false)
 
@@ -122,7 +128,12 @@ export default function Conversar({ ir }) {
     montada.current = true
     return () => {
       montada.current = false
-      reconhecedor.current?.abort()
+      window.clearTimeout(vigia.current)
+      try {
+        reconhecedor.current?.abort()
+      } catch {
+        /* nada */
+      }
     }
   }, [])
 
@@ -146,25 +157,66 @@ export default function Conversar({ ir }) {
     })
   }
 
+  // Para de ouvir e solta o botão na hora, mesmo que o navegador não avise que parou.
+  function pararDeOuvir() {
+    window.clearTimeout(vigia.current)
+    const rec = reconhecedor.current
+    reconhecedor.current = null
+    setOuvindo(false)
+    if (!rec) return
+    rec.onerror = null
+    rec.onend = null
+    try {
+      rec.stop() // o que já foi dito ainda chega pelo onresult
+    } catch {
+      /* nada */
+    }
+  }
+
+  function microfoneNaoFuncionou(erro) {
+    pararDeOuvir()
+    setMicrofoneFalhou(true)
+    const semPermissao = erro === 'not-allowed' || erro === 'service-not-allowed'
+    const mensagem = semPermissao
+      ? 'O microfone não está liberado neste aparelho. Escreva a pergunta aqui embaixo ou toque numa pergunta pronta.'
+      : erro === 'no-speech'
+        ? 'Não ouvi nada. Toque no botão e fale de novo, ou escreva a pergunta aqui embaixo.'
+        : 'Não deu para ouvir. Toque no botão e fale de novo, ou escreva a pergunta aqui embaixo.'
+    setAviso(mensagem)
+    if (ligadoRef.current) dizer(mensagem)
+  }
+
   function falar() {
     if (ouvindo) {
-      reconhecedor.current?.stop()
+      pararDeOuvir()
       return
     }
     parar()
     setAviso('')
-    const rec = new Reconhecimento()
-    rec.lang = 'pt-BR'
-    rec.interimResults = false
-    rec.maxAlternatives = 1
-    rec.onresult = (evento) => enviar(evento.results[0][0].transcript)
-    rec.onerror = (evento) => {
-      if (evento.error !== 'aborted') setAviso('Não deu para ouvir. Toque no botão e fale de novo.')
+    try {
+      const rec = new Reconhecimento()
+      rec.lang = 'pt-BR'
+      rec.interimResults = false
+      rec.maxAlternatives = 1
+      rec.onresult = (evento) => {
+        const dito = evento.results?.[0]?.[0]?.transcript
+        if (dito) enviar(dito)
+      }
+      rec.onerror = (evento) => {
+        if (reconhecedor.current === rec && evento.error !== 'aborted') microfoneNaoFuncionou(evento.error)
+      }
+      rec.onend = () => {
+        if (reconhecedor.current === rec) pararDeOuvir()
+      }
+      reconhecedor.current = rec
+      rec.start()
+      setOuvindo(true)
+      vigia.current = window.setTimeout(() => {
+        if (reconhecedor.current === rec) pararDeOuvir()
+      }, TEMPO_MAXIMO_OUVINDO_MS)
+    } catch {
+      microfoneNaoFuncionou('nao-iniciou')
     }
-    rec.onend = () => setOuvindo(false)
-    reconhecedor.current = rec
-    setOuvindo(true)
-    rec.start()
   }
 
   function aoEnviarTexto(evento) {
@@ -176,7 +228,7 @@ export default function Conversar({ ir }) {
   const ultimaResposta = [...mensagens].reverse().find((m) => m.de === 'gotinha')
   const comoPerguntar = Reconhecimento
     ? `Logo abaixo da conversa tem o botão verde Falar: toque nele e diga sua pergunta.${
-        largo ? ' Ou escreva a pergunta no campo embaixo dele e toque em Enviar.' : ''
+        largo || microfoneFalhou ? ' Ou escreva a pergunta no campo embaixo dele e toque em Enviar.' : ''
       }`
     : 'Logo abaixo da conversa tem um campo para escrever a pergunta e o botão Enviar.'
 
@@ -233,10 +285,19 @@ export default function Conversar({ ir }) {
               </button>
             )}
 
-            {/* Sem microfone no navegador, só escrevendo. No computador, o campo aparece também embaixo do Falar. */}
+            {aviso && (
+              <p role="status" className="mt-3 text-xl font-bold text-vermelho">
+                {aviso}
+              </p>
+            )}
+
+            {/* Sem microfone no navegador, só escrevendo. No computador, o campo aparece também embaixo do Falar.
+                No celular, o campo aparece se o microfone falhar. */}
             <form
               onSubmit={aoEnviarTexto}
-              className={`flex-col gap-3 ${Reconhecimento ? 'mt-6 hidden md:flex' : 'mt-8 flex'}`}
+              className={`flex-col gap-3 ${
+                Reconhecimento ? `mt-6 md:flex ${microfoneFalhou ? 'flex' : 'hidden'}` : 'mt-8 flex'
+              }`}
             >
               <label htmlFor="pergunta" className="text-2xl font-bold">
                 {Reconhecimento ? 'Ou escreva sua pergunta' : 'Escreva sua pergunta'}
@@ -260,12 +321,6 @@ export default function Conversar({ ir }) {
                 </button>
               </div>
             </form>
-
-            {aviso && (
-              <p role="status" className="mt-3 text-xl font-bold text-vermelho">
-                {aviso}
-              </p>
-            )}
 
             <PerguntasProntas enviar={enviar} esperando={esperando} className="lg:hidden" />
           </div>
