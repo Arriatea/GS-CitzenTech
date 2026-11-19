@@ -2,33 +2,33 @@
   {
     "cultura": "alface",
     "unidade": "cada pé",
-    "preco_atacado": 1.5,
-    "fonte": "Conab/Prohort – Ceasa/RN Natal",
-    "data_consulta": "PREENCHER COM A CONSULTA",
-    "observacao": "PREENCHER COM A CONSULTA: valor de exemplo"
+    "preco_atacado": 1.8,
+    "fonte": "Ceasa/RN (Natal) – Boletim diário de preços de mercado",
+    "data_consulta": "2026-11-19",
+    "observacao": "Alface lisa (RN/PE): R$ 180,00 o cento, preço mais comum."
   },
   {
     "cultura": "tomate",
     "unidade": "o quilo",
-    "preco_atacado": 5.0,
-    "fonte": "Conab/Prohort – Ceasa/RN Natal",
-    "data_consulta": "PREENCHER COM A CONSULTA",
-    "observacao": "PREENCHER COM A CONSULTA: valor de exemplo"
+    "preco_atacado": 7.3,
+    "fonte": "Ceasa/RN (Natal) – Boletim diário de preços de mercado",
+    "data_consulta": "2026-11-19",
+    "observacao": "Tomate Santa Adélia (BA/PE): R$ 182,50 a caixa de 25 kg, preço mais comum."
   },
   {
     "cultura": "melancia",
     "unidade": "cada uma",
-    "preco_atacado": 8.0,
-    "fonte": "Conab/Prohort – Ceasa/RN Natal",
-    "data_consulta": "PREENCHER COM A CONSULTA",
-    "observacao": "PREENCHER COM A CONSULTA: valor de exemplo"
+    "preco_atacado": 12.5,
+    "fonte": "Ceasa/RN (Natal) – Boletim diário de preços de mercado",
+    "data_consulta": "2026-11-19",
+    "observacao": "Melancia redonda (RN/BA): R$ 2,50 o quilo, preço mais comum. Para o preço de cada uma, usamos 5 kg por melancia (estimativa nossa)."
   },
   {
     "cultura": "cebolinha",
     "unidade": "cada maço",
-    "preco_atacado": 1.2,
-    "fonte": "Conab/Prohort – Ceasa/RN Natal",
-    "data_consulta": "PREENCHER COM A CONSULTA",
-    "observacao": "PREENCHER COM A CONSULTA: valor de exemplo"
+    "preco_atacado": 1.8,
+    "fonte": "Ceasa/RN (Natal) – Boletim diário de preços de mercado",
+    "data_consulta": "2026-11-19",
+    "observacao": "Cebolinha (RN): R$ 1,80 o molho de 100 g, preço mais comum."
   }
 ]

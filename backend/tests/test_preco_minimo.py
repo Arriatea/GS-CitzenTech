@@ -33,7 +33,7 @@ def test_rota_mostra_como_calculamos(cliente):
     assert {"nome", "unidade", "valor"} <= preco.keys()
     calculo = preco["como_calculamos"]
     assert calculo["media_comerciantes_locais"] == 2.8
-    assert calculo["preco_atacado_ceasa"] == 1.5
+    assert calculo["preco_atacado_ceasa"] == 1.8
     assert calculo["custo_por_unidade"] == pytest.approx(1.71)
 
 

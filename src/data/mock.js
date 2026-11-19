@@ -131,7 +131,7 @@ export const precos = [
   { id: 'alface', figura: '🥬', nome: 'Alface', unidade: 'cada pé', valor: 2.8, contagem: ['pé', 'pés'] },
   { id: 'cebolinha', figura: '🌿', nome: 'Cebolinha', unidade: 'cada maço', valor: 2.2, contagem: ['maço', 'maços'] },
   { id: 'tomate', figura: '🍅', nome: 'Tomate', unidade: 'o quilo', valor: 9, contagem: ['quilo', 'quilos'] },
-  { id: 'melancia', figura: '🍉', nome: 'Melancia', unidade: 'cada uma', valor: 12, contagem: ['melancia', 'melancias'] },
+  { id: 'melancia', figura: '🍉', nome: 'Melancia', unidade: 'cada uma', valor: 12.5, contagem: ['melancia', 'melancias'] },
 ]
 
 export const compradores = [
