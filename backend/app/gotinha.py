@@ -36,6 +36,7 @@ def _preparar():
             from gota_agente.agent import root_agent
 
             # As ferramentas chamam este backend por HTTP: o agente roda num laço próprio para não travar o servidor.
+            os.environ.setdefault("GOTA_API_URL", f"http://127.0.0.1:{os.getenv('PORT', '8000')}")
             _laco = asyncio.new_event_loop()
             threading.Thread(target=_laco.run_forever, daemon=True).start()
             # Os dois usam as mesmas sessões, então a conversa continua mesmo se trocar de modelo.
