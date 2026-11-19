@@ -5,14 +5,14 @@
 | Campo                  | Informação                                                                                                   |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------ |
 | Nome                   | Gota a Gota                                                                                                  |
-| Cidade / bairro        | Comunidade Angélica, Ipanguaçu (RN). PREENCHER se houver outras comunidades                                  |
+| Cidade / bairro        | Comunidade Angélica, Ipanguaçu (RN). As outras comunidades do painel da ONG são exemplos                     |
 | Cidadão beneficiado    | Famílias de comunidades rurais do semiárido potiguar que receberam um poço (donas de casa, agricultores)     |
-| Problema em uma frase  | PREENCHER                                                                                                    |
+| Problema em uma frase  | Depois que o poço chega, a família não sabe se a água está boa nem quanto ela dura, e não tem apoio para plantar e vender a horta por um preço que pague a bomba, então o poço deixa de se sustentar |
 | Como funciona          | Sensores na caixa d'água e na horta mandam leituras para uma API; o app mostra a água, orienta a horta, calcula o preço mínimo de venda e responde por voz com a Gotinha |
 | O que cada parte faz   | Veja [As partes](#as-partes)                                                                                 |
 | Repositório            | https://github.com/Arriatea/GS-CitzenTech                                                                    |
-| Indicador de impacto   | PREENCHER                                                                                                    |
-| ODS                    | PREENCHER                                                                                                    |
+| Indicador de impacto   | Dias de água para beber garantidos na caixa (o app calcula a cada leitura) e renda mensal de cada família com a horta (colheitas registradas × preço mínimo) |
+| ODS                    | ODS 6 (Água potável e saneamento), ODS 2 (Fome zero e agricultura sustentável) e ODS 8 (Trabalho decente e crescimento econômico) |
 
 Plataforma para comunidades rurais do semiárido do Rio Grande do Norte que receberam um poço
 (inspirada no projeto Leve Poços, Comunidade Angélica, Ipanguaçu/RN). O app cuida do "depois do poço":
@@ -40,9 +40,11 @@ a bomba solar, a qualidade da água e a saúde da horta pelas câmeras.
 - O front consulta a água a cada 5 segundos. Quando chega uma leitura nova, a tela Início muda sozinha
   e a audiodescrição avisa.
 - O front fala com a Gotinha por `POST /conversar`. O backend roda o agente, e as ferramentas dele
-  consultam o próprio backend pelo endereço `GOTA_API_URL`.
-- O sketch do ESP32 monta o JSON de `POST /leituras` e mostra no monitor Serial. Para testar, envie esse
-  JSON para a API (exemplo em [Como rodar tudo](#como-rodar-tudo)).
+  consultam o próprio backend pelo endereço `GOTA_API_URL`. Se o Gemini estiver sobrecarregado, o backend
+  tenta um modelo reserva (`gemini-flash-lite-latest`).
+- O ESP32 manda a leitura para `POST /leituras` por Wi-Fi a cada 10 segundos (rede `Wokwi-GUEST`). O simulador
+  do site do Wokwi não enxerga o `localhost`: ele envia para a API publicada (`API_LEITURAS`, no `iot/sketch.ino`).
+  No computador, dá para simular a leitura com `curl` (exemplo em [Como rodar tudo](#como-rodar-tudo)).
 
 ## Como rodar tudo
 
@@ -63,7 +65,8 @@ uvicorn app.principal:app --reload --port 8000
 | ---------------------------- | ------------------------------------------------------------------------- |
 | `GOOGLE_API_KEY`             | Chave do Google AI Studio usada pela Gotinha dentro do app                |
 | `GOOGLE_GENAI_USE_VERTEXAI`  | `FALSE` para usar a chave do AI Studio                                    |
-| `GOTA_API_URL`               | Endereço deste próprio backend, usado pelas ferramentas da Gotinha        |
+| `GOTA_API_URL`               | Opcional. Endereço deste próprio backend, usado pelas ferramentas da Gotinha (sem ela, o backend usa o próprio endereço local) |
+| `GOTINHA_MODELO_RESERVA`     | Opcional. Modelo usado se o principal falhar (padrão `gemini-flash-lite-latest`) |
 
 Sem a chave, tudo funciona, e a Gotinha responde "Não consegui responder agora, tente de novo."
 
@@ -101,6 +104,19 @@ curl -X POST http://localhost:8000/leituras -H "Content-Type: application/json" 
 
 Testes do backend: `cd backend` e `python -m pytest`.
 
+## Publicar no Render
+
+O `render.yaml` da raiz cria a API e o front de uma vez, no plano grátis:
+
+1. No Render: **New > Blueprint** e escolha este repositório.
+2. Preencha `GOOGLE_API_KEY` quando o Render pedir.
+3. Se o endereço da API não for `https://gota-a-gota-api.onrender.com`, troque `VITE_API_URL` no serviço
+   `gota-a-gota` (o front) e publique de novo, e troque `API_LEITURAS` no `iot/sketch.ino`.
+
+No plano grátis, a API "dorme" depois de 15 minutos sem uso e leva cerca de um minuto para acordar.
+Enquanto isso, o app mostra os dados simulados; a água volta a ser consultada a cada 5 segundos e as outras
+telas buscam de novo quando são abertas. Antes de apresentar, abra o `/saude` da API para acordá-la.
+
 ## Rotas da API
 
 | Rota                                   | O que faz                                                                      |
@@ -116,9 +132,11 @@ Testes do backend: `cd backend` e `python -m pytest`.
 
 ## Dados
 
-Tudo é **simulado**, menos a referência de preço de atacado da **Conab/Prohort – Ceasa/RN Natal**
-(`backend/dados/precos_referencia.json`). Enquanto a consulta não for feita, os valores desse arquivo são
-de exemplo e estão marcados com "PREENCHER COM A CONSULTA".
+Tudo é **simulado**, menos a referência de preço de atacado da **Ceasa/RN (Natal)**
+(`backend/dados/precos_referencia.json`), tirada do
+[boletim diário de preços de mercado de 19/11/2026](https://transparencia.ceasa.rn.gov.br/cotacoes),
+pelo preço mais comum. A melancia é cotada por quilo (R$ 2,50); para o preço de cada uma usamos 5 kg por
+melancia, uma estimativa nossa.
 
 São simulados: a água e as leituras, as tarefas, os canteiros, as aulas, os compradores, os preços dos
 comerciantes, o custo de produção, as comunidades da ONG (as marcadas "(exemplo)" são fictícias), a análise
@@ -132,7 +150,7 @@ O preço mínimo de cada cultura junta três referências:
 
 | Referência                     | Arquivo / rota                                 | Origem                                         |
 | ------------------------------ | ---------------------------------------------- | ---------------------------------------------- |
-| Preço de atacado               | `backend/dados/precos_referencia.json`         | Conab/Prohort – Ceasa/RN Natal (consulta manual) |
+| Preço de atacado               | `backend/dados/precos_referencia.json`         | Ceasa/RN, boletim diário de 19/11/2026 (consulta manual) |
 | Preço dos comerciantes locais  | `POST /precos-locais` (começa com registros simulados) | Mercadinho, escola, feira                |
 | Custo de produção por unidade  | `backend/dados/custos_producao.json` (simulado) | Sementes, adubo e horas de trabalho por ciclo |
 
@@ -148,8 +166,8 @@ sem mexer no resto.
 
 ## Uso de IA
 
-A Gotinha usa o Gemini pelo Google ADK (`agente/gota_agente/agent.py`). Os prompts usados com ferramentas
-de IA no desenvolvimento estão em [prompts.md](prompts.md).
+A Gotinha usa o Gemini pelo Google ADK (`agente/gota_agente/agent.py`), com um modelo reserva quando o principal
+está sobrecarregado. Os prompts usados com ferramentas de IA no desenvolvimento estão em [prompts.md](prompts.md).
 
 ## Telas da comunidade
 
@@ -159,7 +177,11 @@ de IA no desenvolvimento estão em [prompts.md](prompts.md).
 | `#horta`            | Minha horta         | Foto da planta (resposta simulada) e canteiros, com o que precisa de cuidado primeiro e o aviso da câmera.   |
 | `#aprender`         | Aprender            | Lista de aulas (as terminadas aparecem como "Feita"). `#aprender/pulgao` abre direto uma aula.               |
 | `#vender`           | Vender              | Preço mínimo em formato de plaquinha de feira, a conta "quantos vai vender" e quem compra.                   |
-| `#conversar`        | Falar com a Gotinha | Botão de microfone (ou campo de texto), perguntas prontas e balões; a resposta é lida em voz alta.           |
+| `#conversar`        | Falar com a Gotinha | Botão de microfone (e campo de texto no computador ou sem microfone), perguntas prontas e balões; a resposta é lida em voz alta. |
+
+No computador (a partir de 768px), o conteúdo se abre até 1200px: no Início, a água e a tarefa ficam lado a lado
+e os quatro botões em grade 2x2; os canteiros, os cursos e os compradores ficam em grade; a aula fica numa coluna
+central; e na Gotinha as perguntas prontas vão para o lado. No celular, nada muda.
 
 ## Área da ONG (`#parceiro`)
 
@@ -234,7 +256,8 @@ backend/
   dados_iniciais.json        dados simulados iniciais
   tests/                     testes com pytest
 agente/gota_agente/          Gotinha: agent.py (instrução) e ferramentas.py (chamadas à API)
-iot/                         sketch.ino, diagram.json e libraries.txt do Wokwi
+iot/                         sketch.ino (envia as leituras por Wi-Fi), diagram.json e libraries.txt do Wokwi
+render.yaml                  publicação no Render (API e front)
 prompts.md                   registro do uso de IA
 ```
 
