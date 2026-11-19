@@ -23,7 +23,7 @@ function ParceiroConteudo({ ir, detalhe, comunidadesOng, cursos }) {
   const aberta = comunidadesOng.find((c) => c.id === detalhe)
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pt-4 pb-36">
+    <div className="grade pt-4 pb-36">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b-4 border-nuvem pb-3">
         <a
           href="#inicio"
