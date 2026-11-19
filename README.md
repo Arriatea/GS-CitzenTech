@@ -305,7 +305,7 @@ sem mexer no resto.
 ## Uso de IA
 
 A Gotinha usa o Gemini pelo Google ADK (`agente/gota_agente/agent.py`), com um modelo reserva quando o principal
-está sobrecarregado. Os prompts usados com ferramentas de IA no desenvolvimento estão em [prompts.md](prompts.md).
+está sobrecarregado.
 
 ## Telas da comunidade
 
@@ -402,7 +402,6 @@ agente/gota_agente/          Gotinha: agent.py (instrução) e ferramentas.py (c
 iot/                         sketch.ino (envia as leituras por Wi-Fi), diagram.json e libraries.txt do Wokwi
 docs/                        capa do vídeo pitch e capturas de tela usadas neste README
 render.yaml                  publicação da API no Render (o front vai para a Vercel)
-prompts.md                   registro do uso de IA
 ```
 
 ## Licença
