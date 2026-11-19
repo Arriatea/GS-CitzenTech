@@ -9,6 +9,11 @@
 <p>FIAP &middot; Global Solution &middot; CitizenTech</p>
 
 <p>
+  <a href="https://gs-citzen-tech.vercel.app"><strong>Abrir o app publicado</strong></a> &middot;
+  <a href="https://gota-a-gota-api.onrender.com/saude">API publicada</a>
+</p>
+
+<p>
   <img src="https://img.shields.io/badge/React-19-1f6fe0?style=flat-square&labelColor=22264a&logo=react&logoColor=white" alt="React 19">
   <img src="https://img.shields.io/badge/Vite-8-1f6fe0?style=flat-square&labelColor=22264a&logo=vite&logoColor=white" alt="Vite 8">
   <img src="https://img.shields.io/badge/Tailwind_CSS-4-1f6fe0?style=flat-square&labelColor=22264a&logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4">
@@ -19,6 +24,7 @@
 </p>
 
 <p>
+  <a href="#app-publicado">Publicado</a> &middot;
   <a href="#vídeo-pitch">Pitch</a> &middot;
   <a href="#ficha-da-citizentech">Ficha</a> &middot;
   <a href="#o-app-em-imagens">Imagens</a> &middot;
@@ -39,6 +45,23 @@ Plataforma para comunidades rurais do semiárido do Rio Grande do Norte que rece
 mostra o estado da água, orienta a horta, ensina a plantar e a vender, mostra o preço mínimo de venda
 e conecta as famílias aos compradores. A ONG que acompanha as comunidades vê a caixa d'água,
 a bomba solar, a qualidade da água e a saúde da horta pelas câmeras.
+
+## App publicado
+
+| Parte | Endereço | Onde roda |
+| --- | --- | --- |
+| **Front** (o app) | https://gs-citzen-tech.vercel.app | Vercel |
+| **API** (backend + Gotinha) | https://gota-a-gota-api.onrender.com | Render |
+
+Para ver a API respondendo: [/saude](https://gota-a-gota-api.onrender.com/saude),
+[/agua](https://gota-a-gota-api.onrender.com/agua) e
+[/precos/alface](https://gota-a-gota-api.onrender.com/precos/alface). A área da ONG fica em
+[#parceiro](https://gs-citzen-tech.vercel.app/#parceiro).
+
+> [!NOTE]
+> O primeiro acesso pode levar até 1 minuto. A API está no plano grátis do Render, que "dorme" depois de
+> 15 minutos sem uso. Enquanto ela acorda, o app abre com os dados simulados; a água passa a vir da API
+> sozinha, e as outras telas buscam de novo quando são abertas.
 
 ## Vídeo pitch
 
@@ -61,6 +84,7 @@ a bomba solar, a qualidade da água e a saúde da horta pelas câmeras.
 | **Como funciona** | Sensores na caixa d'água e na horta mandam leituras para uma API; o app mostra a água, orienta a horta, calcula o preço mínimo de venda e responde por voz com a Gotinha |
 | **O que cada parte faz** | Veja [As partes](#as-partes) |
 | **Repositório** | https://github.com/Arriatea/GS-CitzenTech |
+| **App publicado** | https://gs-citzen-tech.vercel.app (API em https://gota-a-gota-api.onrender.com) |
 | **Vídeo pitch** | https://youtu.be/a5cI6_gjImc |
 | **Indicador de impacto** | Dias de água para beber garantidos na caixa (o app calcula a cada leitura) e renda mensal de cada família com a horta (colheitas registradas × preço mínimo) |
 | **ODS** | ODS 6 (Água potável e saneamento), ODS 2 (Fome zero e agricultura sustentável) e ODS 8 (Trabalho decente e crescimento econômico) |
@@ -203,14 +227,24 @@ cd backend
 python -m pytest
 ```
 
-## Publicar no Render
+## Como publicar
 
-O `render.yaml` da raiz cria a API e o front de uma vez, no plano grátis:
+A API fica no Render e o front na Vercel, os dois no plano grátis.
+
+### API no Render
+
+O `render.yaml` da raiz cria a API, rodando da raiz do repositório para enxergar `backend/` e `agente/`.
 
 1. No Render: **New > Blueprint** e escolha este repositório.
-2. Preencha `GOOGLE_API_KEY` quando o Render pedir.
-3. Se o endereço da API não for `https://gota-a-gota-api.onrender.com`, troque `VITE_API_URL` no serviço
-   `gota-a-gota` (o front) e publique de novo, e troque `API_LEITURAS` no `iot/sketch.ino`.
+2. Preencha `GOOGLE_API_KEY` quando o Render pedir. A chave fica só no painel, nunca no código.
+3. Opcional: em **Environment**, crie `GOTA_API_URL` com o endereço público da API.
+4. Se o endereço da API não for `https://gota-a-gota-api.onrender.com`, troque `API_LEITURAS` no `iot/sketch.ino`.
+
+### Front na Vercel
+
+1. Na Vercel: **Add New > Project** e importe este repositório, só o projeto **Vite** da raiz.
+2. Em **Environment Variables**, crie `VITE_API_URL` com o endereço da API, sem barra no fim.
+3. Clique em **Deploy**. Se o endereço da API mudar depois, troque a variável e publique de novo.
 
 > [!TIP]
 > No plano grátis, a API "dorme" depois de 15 minutos sem uso e leva cerca de um minuto para acordar.
@@ -367,7 +401,7 @@ backend/
 agente/gota_agente/          Gotinha: agent.py (instrução) e ferramentas.py (chamadas à API)
 iot/                         sketch.ino (envia as leituras por Wi-Fi), diagram.json e libraries.txt do Wokwi
 docs/                        capa do vídeo pitch e capturas de tela usadas neste README
-render.yaml                  publicação no Render (API e front)
+render.yaml                  publicação da API no Render (o front vai para a Vercel)
 prompts.md                   registro do uso de IA
 ```
 
