@@ -64,6 +64,26 @@ Para ver a API respondendo: [/saude](https://gota-a-gota-api.onrender.com/saude)
 > 15 minutos sem uso. Enquanto ela acorda, o app abre com os dados simulados; a água passa a vir da API
 > sozinha, e as outras telas buscam de novo quando são abertas.
 
+### Recomendado: abrir no celular
+
+O app foi feito para o celular, que é como a família usa. No computador ele também funciona, com as telas
+mais largas, e a área da ONG foi pensada para a tela grande.
+
+Para **falar com a Gotinha** pelo microfone, o navegador precisa do reconhecimento de voz do aparelho:
+
+| Aparelho | Navegador | O que precisa estar ligado |
+| --- | --- | --- |
+| **iPhone (iOS)** | Safari | O Ditado, em **Ajustes > Geral > Teclado > Ativar Ditado**, e a permissão de microfone quando o Safari pedir. |
+| **Android** | Chrome | A permissão de microfone para o site (toque em **Permitir** quando o Chrome pedir) e internet, porque o reconhecimento de voz é do Google. |
+
+Em qualquer aparelho:
+
+- **Se o microfone não funcionar**, use o campo "Ou escreva sua pergunta", que fica sempre embaixo do botão
+  Falar, ou toque numa pergunta pronta. Os dois funcionam sem microfone.
+- **Para ouvir a audiodescrição e as respostas**, deixe o volume de mídia alto e o modo silencioso desligado.
+  A voz só começa depois do primeiro toque na tela, porque o navegador exige.
+- **Navegadores sem reconhecimento de voz** (como o Firefox) mostram só o campo de escrever no lugar do botão Falar.
+
 ## Vídeo pitch
 
 <div align="center">
@@ -325,7 +345,7 @@ está sobrecarregado.
 | `#horta` | **Minha horta** | Foto da planta (resposta simulada) e canteiros, com o que precisa de cuidado primeiro e o aviso da câmera. |
 | `#aprender` | **Aprender** | Lista de aulas (as terminadas aparecem como "Feita"). `#aprender/pulgao` abre direto uma aula. |
 | `#vender` | **Vender** | Preço mínimo em formato de plaquinha de feira, a conta "quantos vai vender" e quem compra. |
-| `#conversar` | **Falar com a Gotinha** | Botão de microfone (e campo de texto no computador ou sem microfone), perguntas prontas e balões; a resposta é lida em voz alta. |
+| `#conversar` | **Falar com a Gotinha** | Botão de microfone, campo para escrever a pergunta, perguntas prontas e balões; a resposta é lida em voz alta. |
 
 No computador (a partir de 768px), o conteúdo se abre até 1200px: no Início, a água e a tarefa ficam lado a lado
 e os quatro botões em grade 2x2; os canteiros, os cursos e os compradores ficam em grade; a aula fica numa coluna
