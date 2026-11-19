@@ -33,7 +33,8 @@ export const buscarCompradores = () => buscar('/compradores', mock.compradores)
 export const buscarImpacto = () => buscar('/impacto', null)
 export const buscarComunidades = () => buscar('/comunidades', mock.comunidadesOng)
 
-const TEMPO_LIMITE_CONVERSA_MS = 30000
+// O backend tenta o modelo principal (até 15 s) e depois o reserva (até 20 s).
+const TEMPO_LIMITE_CONVERSA_MS = 40000
 export const RESPOSTA_DE_ERRO = 'Não consegui responder agora, tente de novo.'
 
 export async function conversar(sessao, mensagem) {
