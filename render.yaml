@@ -1,0 +1,40 @@
+# Blueprint do Render: no painel, New > Blueprint e escolha este repositório.
+services:
+  # API (FastAPI) com a Gotinha. Roda da raiz para enxergar a pasta agente/.
+  - type: web
+    name: gota-a-gota-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn app.principal:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /saude
+    buildFilter:
+      paths:
+        - backend/**
+        - agente/**
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: GOOGLE_GENAI_USE_VERTEXAI
+        value: "FALSE"
+      - key: GOOGLE_API_KEY
+        sync: false
+
+  # Front (React + Vite) como site estático.
+  - type: web
+    name: gota-a-gota
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    buildFilter:
+      paths:
+        - src/**
+        - public/**
+        - index.html
+        - package.json
+        - package-lock.json
+        - vite.config.js
+    envVars:
+      # Troque se o Render der outro endereço para a API.
+      - key: VITE_API_URL
+        value: https://gota-a-gota-api.onrender.com
