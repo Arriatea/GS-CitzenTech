@@ -16,11 +16,23 @@
   - Sem sol: a bomba desliga; se a terra estiver seca, a válvula abre e irriga com a água da caixa.
   - A caixa guarda uma RESERVA PARA BEBER: abaixo dela, a válvula não abre para a horta.
   - Se vai chover amanhã, a irrigação fica pausada (a bomba ainda enche a caixa).
-  - A cada 2 segundos, o ESP32 monta o JSON que seria enviado para a API Java.
+  - A cada 2 segundos, o ESP32 mostra a leitura no Serial; a cada 10 segundos, envia para a API (POST /leituras).
+
+  Wi-Fi: no Wokwi a rede é a "Wokwi-GUEST", sem senha. A API precisa estar na internet
+  (o simulador do site não enxerga o localhost do seu computador): troque API_LEITURAS pelo endereço dela.
 */
 
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <WiFi.h>
+#include <WiFiClientSecure.h>
+#include <HTTPClient.h>
+
+// ---------- Rede e API ----------
+const char* WIFI_NOME = "Wokwi-GUEST";
+const char* WIFI_SENHA = "";
+const char* API_LEITURAS = "https://gota-a-gota-api.onrender.com/leituras";
+const unsigned long ENVIO_API_MS = 10000;
 
 // ---------- Pinos ----------
 const int PINO_TRIG = 5;
@@ -45,6 +57,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 bool chuvaAmanha = false;
 bool botaoAntes = HIGH;
 unsigned long ultimoEnvio = 0;
+unsigned long ultimoEnvioApi = 0;
 bool telaAlternada = false;
 
 float medirDistanciaCm() {
@@ -61,6 +74,35 @@ int nivelCaixa() {
   float distancia = medirDistanciaCm();
   int nivel = (int)((ALTURA_CAIXA_CM - distancia) / ALTURA_CAIXA_CM * 100.0);
   return constrain(nivel, 0, 100);
+}
+
+void conectarWifi() {
+  lcd.setCursor(0, 1);
+  lcd.print(" conectando...  ");
+  WiFi.begin(WIFI_NOME, WIFI_SENHA, 6);
+  unsigned long inicio = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - inicio < 10000) {
+    delay(250);
+  }
+  Serial.println(WiFi.status() == WL_CONNECTED ? "Wi-Fi conectado" : "Sem Wi-Fi: segue só no Serial");
+}
+
+// Envia a leitura para a API. Se a API demorar (o Render grátis "dorme"), tenta de novo no próximo envio.
+void enviarParaApi(const String& json) {
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFi.reconnect();
+    return;
+  }
+  WiFiClientSecure cliente;
+  cliente.setInsecure();
+  HTTPClient http;
+  http.setTimeout(8000);
+  http.begin(cliente, API_LEITURAS);
+  http.addHeader("Content-Type", "application/json");
+  int codigo = http.POST(json);
+  Serial.print("API /leituras: ");
+  Serial.println(codigo);
+  http.end();
 }
 
 void setup() {
@@ -80,7 +122,7 @@ void setup() {
   lcd.print("  Gota a Gota  ");
   lcd.setCursor(0, 1);
   lcd.print("  iniciando... ");
-  delay(1500);
+  conectarWifi();
 }
 
 void loop() {
@@ -142,26 +184,22 @@ void loop() {
       else lcd.print("Irriga: nao");
     }
 
-    // JSON que seria enviado para a API Java (POST /leituras)
-    Serial.print("{\"nivelCaixa\":");
-    Serial.print(nivel);
-    Serial.print(",\"umidadeSolo\":");
-    Serial.print(umidadeSolo);
-    Serial.print(",\"temSol\":");
-    Serial.print(temSol ? "true" : "false");
-    Serial.print(",\"bomba\":");
-    Serial.print(bomba ? "true" : "false");
-    Serial.print(",\"valvula\":");
-    Serial.print(valvula ? "true" : "false");
-    Serial.print(",\"irrigando\":");
-    Serial.print((valvula || (bomba && precisaIrrigar)) ? "true" : "false");
-    Serial.print(",\"chuvaAmanha\":");
-    Serial.print(chuvaAmanha ? "true" : "false");
-    Serial.print(",\"semaforo\":\"");
-    Serial.print(semaforo);
-    Serial.print("\",\"leituraLuz\":");
-    Serial.print(leituraLuz);
-    Serial.println("}");
+    // JSON da leitura, no formato do POST /leituras
+    String json = "{\"nivelCaixa\":" + String(nivel) +
+                  ",\"umidadeSolo\":" + String(umidadeSolo) +
+                  ",\"temSol\":" + (temSol ? "true" : "false") +
+                  ",\"bomba\":" + (bomba ? "true" : "false") +
+                  ",\"valvula\":" + (valvula ? "true" : "false") +
+                  ",\"irrigando\":" + ((valvula || (bomba && precisaIrrigar)) ? "true" : "false") +
+                  ",\"chuvaAmanha\":" + (chuvaAmanha ? "true" : "false") +
+                  ",\"semaforo\":\"" + semaforo +
+                  "\",\"leituraLuz\":" + String(leituraLuz) + "}";
+    Serial.println(json);
+
+    if (millis() - ultimoEnvioApi > ENVIO_API_MS) {
+      ultimoEnvioApi = millis();
+      enviarParaApi(json);
+    }
   }
 
   delay(50);
